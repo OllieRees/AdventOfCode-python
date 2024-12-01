@@ -1,5 +1,8 @@
 .mypy_cache/*
 .vscode/*
-poetry.lock
+
 inputs/*
+
 poetry.lock
+
+src/**/__pycache__/*
