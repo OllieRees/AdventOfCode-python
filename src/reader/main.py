@@ -16,6 +16,8 @@ class InputMode(StrEnum):
 
 class Puzzle:
     def __init__(self, *, day: int, year: int) -> None:
+        if not PUZZLES.get((year, day)):
+            raise ValueError(f"No puzzle found for year and day. Year={year} Day={day}")
         self.day = day
         self.year = year
 
