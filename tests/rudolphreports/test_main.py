@@ -68,7 +68,7 @@ class TestReport(TestCase):
         assert not Report(levels=[1, 2, 7, 8, 9]).is_safe
 
     def test_apply_dampener_on_safe_report(self) -> None:
-        assert Report(levels=[7, 6, 4, 2, 1]).safe_dampener.levels == [7, 6, 4, 2, 1]
+        assert Report(levels=[7, 6, 4, 2, 1]).safe_dampener.levels == [6, 4, 2, 1]
 
     def test_apply_dampener_due_to_inconsistent_trend(self) -> None:
         assert Report(levels=[1, 3, 2, 4, 5]).safe_dampener.levels == [1, 2, 4, 5]

@@ -4,10 +4,6 @@ from typing import Generator, Iterator, List, Optional
 from paprika import catch
 
 
-class UnsafeReport(Exception):
-    pass
-
-
 class LevelTrend:
     def __init__(self, *, levels: List[int]) -> None:
         self.levels = levels 
