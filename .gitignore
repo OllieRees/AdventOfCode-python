@@ -6,3 +6,4 @@ inputs/*
 poetry.lock
 
 src/**/__pycache__/*
+tests/**/__pycache__/*
