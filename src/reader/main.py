@@ -44,5 +44,5 @@ class PuzzleInput:
     @property
     def lines(self) -> Iterator[str]:
         with open(self._filepath) as f:
-            return iter(f.readlines())
+            return iter(f.read().splitlines())
         raise FileNotFoundError
