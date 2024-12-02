@@ -19,6 +19,8 @@ class HistoriansLists:
     @classmethod
     def from_input(cls, lines: Iterator[str]) -> "HistoriansLists":
         xs = [tuple(map(int, line.split())) for line in lines]
+        if not all(len(x) == 2 for x in xs):
+            raise ValueError("Input must be divided into exaclty two columns")
         return HistoriansLists(left=[x[0] for x in xs], right=[x[1] for x in xs])
 
 
