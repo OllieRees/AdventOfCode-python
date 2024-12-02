@@ -1,6 +1,12 @@
 from functools import cached_property
 from typing import Iterator, List
 
+from paprika import catch
+
+
+class UnsafeReport(Exception):
+    pass
+
 
 class LevelTrend:
     def __init__(self, *, levels: List[int]) -> None:
@@ -25,7 +31,7 @@ class LevelChanges:
 
     def within_range(self, min: int, max: int) -> bool:
         return all(min <= abs(level) <= max for level in self.level_changes)
-    
+
 
 class Report:
     def __init__(self, levels: List[int]):
@@ -46,7 +52,28 @@ class Report:
     def is_safe(self) -> bool:
         return self.level_trend.is_consistent and self.level_changes.within_range(1, 3)
 
+    def _remove_level(self, *, index: int) -> "Report":
+        return Report(levels=self.levels[:index] + self.levels[(index + 1):])
+    
+    @property
+    def _dampeners(self) -> Iterator["Report"]:
+        return (self._remove_level(index=i) for i, _ in enumerate(self.levels))
+    
+    def apply_dampener(self) -> "Report":
+        if self.is_safe:
+            return self
+        try:
+            return next(r for r in self._dampeners if r.is_safe)
+        except StopIteration as err:
+            raise UnsafeReport from err
+    
+    @property
+    @catch(exception=UnsafeReport, handler=lambda _: False)
+    def is_safe_with_dampener(self) -> bool:         
+        return self.apply_dampener().is_safe
+
 
 def main(lines: Iterator[str]) -> None:
     reports = [Report(levels=[int(report) for report in report_line.split()]) for report_line in lines]
     print(f"Number of Reports that are safe: {len([report for report in reports if report.is_safe])}")
+    print(f"Number of Dampened Reports that are safe: {len([report for report in reports if report.is_safe_with_dampener])}")

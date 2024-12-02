@@ -1,6 +1,8 @@
 from unittest import TestCase
 
-from rudolphreports.main import LevelChanges, LevelTrend, Report
+import pytest
+
+from rudolphreports.main import LevelChanges, LevelTrend, Report, UnsafeReport
 
 
 class TestLevelTrend(TestCase):
@@ -66,3 +68,16 @@ class TestReport(TestCase):
 
     def test_is_unsafe_too_high_diff(self) -> None:
         assert not Report(levels=[1, 2, 7, 8, 9]).is_safe
+
+    def test_apply_dampener_on_safe_report(self) -> None:
+        assert Report(levels=[7, 6, 4, 2, 1]).apply_dampener().levels == [7, 6, 4, 2, 1]
+
+    def test_apply_dampener_due_to_inconsistent_trend(self) -> None:
+        assert Report(levels=[1, 3, 2, 4, 5]).apply_dampener().levels == [1, 2, 4, 5]
+
+    def test_apply_dampener_due_to_out_of_range_level(self) -> None:
+        assert Report(levels=[8, 6, 4, 4, 1]).apply_dampener().levels == [8, 6, 4, 1]
+
+    def test_apply_dampener_failure(self) -> None:
+        with pytest.raises(UnsafeReport):
+            Report(levels=[1, 2, 7, 8, 9]).apply_dampener()
