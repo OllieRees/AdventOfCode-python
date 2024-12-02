@@ -1,7 +1,8 @@
 from reader.main import InputMode, Puzzle
 
 if __name__ == '__main__':
-    puzzle = Puzzle(year=2024, day=1)
+    day = int(input("Please enter the day: "))
+    puzzle = Puzzle(year=2024, day=day)
     print("-------------------------------------------")
     puzzle.run(InputMode.PRACTICE)
     print("-------------------------------------------")
