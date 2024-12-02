@@ -10,10 +10,16 @@ python = "^3.12"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
+flake8 = "*"
+black = "*"
+isort = "*"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
 
 [tool.flake8]
 max-line-length = 120
