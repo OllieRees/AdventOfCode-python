@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Iterator, List
+from typing import Generator, Iterator, List, Optional
 
 from paprika import catch
 
@@ -52,26 +52,24 @@ class Report:
     def is_safe(self) -> bool:
         return self.level_trend.is_consistent and self.level_changes.within_range(1, 3)
 
-    def _remove_level(self, *, index: int) -> "Report":
+    def _remove_level_by_index(self, *, index: int) -> "Report":
         return Report(levels=self.levels[:index] + self.levels[(index + 1):])
     
     @property
-    def _dampeners(self) -> Iterator["Report"]:
-        return (self._remove_level(index=i) for i, _ in enumerate(self.levels))
-    
-    def apply_dampener(self) -> "Report":
-        if self.is_safe:
-            return self
-        try:
-            return next(r for r in self._dampeners if r.is_safe)
-        except StopIteration as err:
-            raise UnsafeReport from err
+    def dampened_reports(self) -> Generator["Report", None, None]:
+        for i, _ in enumerate(self.levels):
+            yield self._remove_level_by_index(index=i) 
+        return None
     
     @property
-    @catch(exception=UnsafeReport, handler=lambda _: False)
-    def is_safe_with_dampener(self) -> bool:         
-        return self.apply_dampener().is_safe
-
+    @catch(exception=StopIteration, handler=lambda _: None)
+    def safe_dampener(self) -> Optional["Report"]:
+        return next(d for d in self.dampened_reports if d.is_safe)
+            
+    @property
+    def is_safe_with_dampener(self) -> bool:
+        return self.is_safe or self.safe_dampener
+    
 
 def main(lines: Iterator[str]) -> None:
     reports = [Report(levels=[int(report) for report in report_line.split()]) for report_line in lines]

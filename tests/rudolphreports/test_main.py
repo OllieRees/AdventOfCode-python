@@ -1,8 +1,6 @@
 from unittest import TestCase
 
-import pytest
-
-from rudolphreports.main import LevelChanges, LevelTrend, Report, UnsafeReport
+from rudolphreports.main import LevelChanges, LevelTrend, Report
 
 
 class TestLevelTrend(TestCase):
@@ -70,17 +68,16 @@ class TestReport(TestCase):
         assert not Report(levels=[1, 2, 7, 8, 9]).is_safe
 
     def test_apply_dampener_on_safe_report(self) -> None:
-        assert Report(levels=[7, 6, 4, 2, 1]).apply_dampener().levels == [7, 6, 4, 2, 1]
+        assert Report(levels=[7, 6, 4, 2, 1]).safe_dampener.levels == [7, 6, 4, 2, 1]
 
     def test_apply_dampener_due_to_inconsistent_trend(self) -> None:
-        assert Report(levels=[1, 3, 2, 4, 5]).apply_dampener().levels == [1, 2, 4, 5]
+        assert Report(levels=[1, 3, 2, 4, 5]).safe_dampener.levels == [1, 2, 4, 5]
 
     def test_apply_dampener_due_to_out_of_range_level(self) -> None:
-        assert Report(levels=[8, 6, 4, 4, 1]).apply_dampener().levels == [8, 6, 4, 1]
+        assert Report(levels=[8, 6, 4, 4, 1]).safe_dampener.levels == [8, 6, 4, 1]
 
     def test_apply_dampener_failure(self) -> None:
-        with pytest.raises(UnsafeReport):
-            Report(levels=[1, 2, 7, 8, 9]).apply_dampener()
+        assert Report(levels=[1, 2, 7, 8, 9]).safe_dampener is None
 
     def test_dampener_is_safe_without_change(self) -> None:
         assert Report(levels=[7, 6, 4, 2, 1]).is_safe_with_dampener
