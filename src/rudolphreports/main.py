@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import Iterator, List
 
 
@@ -33,11 +34,11 @@ class Report:
     def __str__(self) -> str:
         return f"Report<levels={self.levels}>"
     
-    @property
+    @cached_property
     def level_changes(self) -> LevelChanges:
         return LevelChanges(levels=self.levels)
     
-    @property
+    @cached_property
     def level_trend(self) -> LevelTrend:
         return LevelTrend(levels=self.levels)
          
