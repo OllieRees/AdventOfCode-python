@@ -1,24 +1,59 @@
 from unittest import TestCase
 
-from rudolphruports.main import Report
+from rudolphreports.main import LevelChanges, LevelTrend, Report
 
+
+class TestLevelTrend(TestCase):
+    def test_all_incrementing(self) -> None:
+        assert LevelTrend(levels=[1, 2, 3, 4, 5]).all_incrementing
+
+    def test_some_incrementing(self) -> None:
+        assert not LevelTrend(levels=[1, 2, -1, 4, 5]).all_incrementing
+
+    def test_none_incrementing(self) -> None:
+        assert not LevelTrend(levels=[5, 4, 3, 2, 1]).all_incrementing
+
+    def test_all_decrementing(self) -> None:
+        assert LevelTrend(levels=[5, 4, 3, 2, 1]).all_decrementing
+
+    def test_some_decrementing(self) -> None:
+        assert not LevelTrend(levels=[5, 4, 7, 2, 1]).all_decrementing
+
+    def test_none_decrementing(self) -> None:
+        assert not LevelTrend(levels=[1, 2, 3, 4, 5]).all_decrementing
+
+    def test_is_consistent_incrementing(self) -> None:
+        assert LevelTrend(levels=[1, 2, 3, 4, 5]).is_consistent
+
+    def test_is_consistent_decrementing(self) -> None:
+        assert LevelTrend(levels=[5, 4, 3, 2, 1]).is_consistent
+
+    def test_is_not_consistent(self) -> None:
+        assert not LevelTrend(levels=[1, 2, -1, 4, 5]).is_consistent
+
+
+class TestLevelChanges(TestCase):
+    def test_within_range(self) -> None:
+        assert LevelChanges(levels=[3, 5, 6, 9]).within_range(1, 3)
+
+    def test_below_range(self) -> None:
+        assert not LevelChanges(levels=[3, 6, 6, 8]).within_range(1, 3)
+        
+    def test_above_range(self) -> None:
+        assert not LevelChanges(levels=[3, 6, 10, 8]).within_range(1, 3)
+
+    def test_below_range_initially(self) -> None:
+        assert not LevelChanges(levels=[3, 3, 4, 6]).within_range(1, 3)
+
+    def test_above_range_initially(self) -> None:
+        assert not LevelChanges(levels=[3, 9, 11, 12]).within_range(1, 3)
 
 class TestReport(TestCase):
-    def test_levels_difference_constant(self) -> None:
-        report = Report(levels=list(range(3, 16, 3)))
-        assert report._levels_difference == [3, 3, 3, 3] 
+    def test_levels_changes(self) -> None:
+        assert Report(levels=[4, 9, 6, 12, 15, 13]).level_changes
 
-    def test_levels_difference_alternate(self) -> None:
-        report = Report(levels=[4, 9, 6, 12, 15, 13])
-        assert report._levels_difference == [5, -3, 6, 3, -2]
-
-    def test_levels_difference_inconsistent_increase(self) -> None:
-        report = Report(levels=[1, 3, 6, 10, 15])
-        assert report._levels_difference == [2, 3, 4, 5] 
-
-    def test_levels_difference_inconsistent_decrease(self) -> None:
-        report = Report(levels=[20, 15, 8, 2, 1])
-        assert report._levels_difference == [-5, -7, -6, -1]
+    def test_levels_trend(self) -> None:
+        assert Report(levels=[4, 9, 6, 12, 15, 13]).level_trend
 
     def test_is_safe(self) -> None:
         assert Report(levels=[7, 6, 4, 2, 1]).is_safe

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Callable, Dict, Iterator, Tuple
 
 import historianhysteria.main as HistorianHysteria
-import rudolphruports.main as RudolphReports
+import rudolphreports.main as RudolphReports
 
 PUZZLES: Dict[Tuple[int, int], Callable[[Iterator[str]], None]] = {
     (2024, 1): HistorianHysteria.main,
