@@ -1,5 +1,5 @@
-from typing import List, Iterator
 from collections import Counter
+from typing import Iterator, List
 
 
 class HistoriansLists:
