@@ -1,8 +1,7 @@
 from enum import StrEnum
-from typing import Dict, Tuple, Callable, Iterator
+from typing import Callable, Dict, Iterator, Tuple
 
 import historianhysteria.main as historianHysteria
-
 
 PUZZLES: Dict[Tuple[int, int], Callable[[Iterator[str]], None]] = {
     (2024, 1): historianHysteria.main
