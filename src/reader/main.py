@@ -1,4 +1,5 @@
 from enum import StrEnum
+from pathlib import Path
 from typing import Callable, Dict, Iterator, Tuple
 
 import historianhysteria.main as historianHysteria
@@ -37,8 +38,8 @@ class PuzzleInput:
         self.mode = mode
 
     @property
-    def _filepath(self) -> str:
-        return f"inputs/{self.puzzle.year}/{self.puzzle.day}/{self.mode}.txt"
+    def _filepath(self) -> Path:
+        return Path(f"inputs/{self.puzzle.year}/{self.puzzle.day}/{self.mode}.txt")
 
     @property
     def lines(self) -> Iterator[str]:
