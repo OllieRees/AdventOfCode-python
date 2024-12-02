@@ -14,9 +14,10 @@ class Report:
 
     @property
     def is_safe(self) -> bool:
-        return False
-
-
+        return all(1 <= abs(level_diff) <= 3 for level_diff in self._levels_difference) and (
+            all((level_diff < 0 for level_diff in self._levels_difference)) or all((level_diff > 0 for level_diff in self._levels_difference))
+        )
+    
 def main(lines: Iterator[str]) -> None:
     reports = [Report(levels=[int(report) for report in report_line.split()]) for report_line in lines]
     print(f"Number of Reports that are safe: {len([report for report in reports if report.is_safe])}")
