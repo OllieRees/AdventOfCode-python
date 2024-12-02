@@ -81,3 +81,12 @@ class TestReport(TestCase):
     def test_apply_dampener_failure(self) -> None:
         with pytest.raises(UnsafeReport):
             Report(levels=[1, 2, 7, 8, 9]).apply_dampener()
+
+    def test_dampener_is_safe_without_change(self) -> None:
+        assert Report(levels=[7, 6, 4, 2, 1]).is_safe_with_dampener
+
+    def test_dampener_is_safe_with_change(self) -> None:
+        assert Report(levels=[1, 3, 2, 4, 5]).is_safe_with_dampener
+
+    def test_dampener_is_not_safe(self) -> None:
+        assert not Report(levels=[1, 2, 7, 8, 9]).is_safe_with_dampener
