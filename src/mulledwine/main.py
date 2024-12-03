@@ -18,6 +18,7 @@ class Tokeniser:
     def capture(self, s: str) -> Generator[re.Match[str], None, None]:
         for match in self._regex.finditer(s):
             yield match
+        raise ValueError(f"Pattern not found in Token. Token={s} Pattern={self.pattern}")
 
     def tokenise(self, s: str) -> Generator[Token, None, None]:
         for token in self.capture(s):
