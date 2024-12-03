@@ -7,14 +7,18 @@ class Token:
         if not tokeniser.can_tokenise(token=token):
             raise ValueError(f"Invalid Token for Pattern. Token={token} Pattern={tokeniser.pattern}")
         self._tokeniser = tokeniser
-        self._token = token
+        self.token = token
 
 class Tokeniser:
     def __init__(self, *, pattern: str):
         self.pattern = pattern
         self._regex = re.compile(pattern)
 
-    def tokenise(self, *, s: str) -> Generator[Token, None, None]:
+    def capture(self, s: str) -> Generator[re.Match[str], None, None]:
+        for match in self._regex.finditer(s):
+            yield match
+
+    def tokenise(self, s: str) -> Generator[Token, None, None]:
         for token in self._regex.finditer(s):
             yield Token(token=token.group(), tokeniser=self)
     
@@ -23,21 +27,29 @@ class Tokeniser:
 
 
 class Multiply(Token):
+    tokeniser = Tokeniser(pattern=r"mul\((\d+),(\d+)\)")
+
     def __init__(self, *, token: str):
-        super().__init__(token=token, tokeniser=Tokeniser(pattern=r"mul(\d+,\d+)"))
-
-    @property
+        super().__init__(token=token, tokeniser=self.tokeniser)
+        self._capture = next(self._tokeniser.capture(token))
+        if len(self._capture.groups()) != 2:
+            raise ValueError(f"Token needs comma separated digits: Token={token}")
+        
+    @property 
     def l(self) -> int:
-        raise NotImplemented
+        return int(self._capture.group(1))
     
-    @property
+    @property 
     def r(self) -> int:
-        raise NotImplemented
-
+        return int(self._capture.group(2))
+    
     @property
     def result(self) -> int:
         return self.l * self.r
     
+    def __str__(self) -> str:
+        return f"{self.l} * {self.r}"
 
 def main(lines: Iterator[str]) -> None:
-    pass
+    tokens = [Multiply(token=token.token) for line in lines for token in Multiply.tokeniser.tokenise(line)]
+    print(f"Token Sum: {sum(token.result for token in tokens)}")
