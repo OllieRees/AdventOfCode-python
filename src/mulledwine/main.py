@@ -7,7 +7,7 @@ class TokenType(StrEnum):
     MUL = r"mul\((\d+),(\d+)\)"
     DO = r"do\(\)"
     DONT = r"dont\(\)"
-        
+
     @classmethod
     def global_regex(cls) -> re.Pattern[str]:
         return re.compile("|".join(r for r in cls))
@@ -15,32 +15,30 @@ class TokenType(StrEnum):
     @property
     def _regex(self) -> re.Pattern[str]:
         return re.compile(self)
-
-    @property
-    def tokeniser(self) -> "Tokeniser":
-        return Tokeniser(type=self)
-
+    
 
 class Tokeniser:
-    def __init__(self, *, type: TokenType):
+    def __init__(self, *, s: str, type: TokenType):
+        self.s = s
         self.type = type
 
-    def capture(self, s: str) -> Generator[re.Match[str], None, None]:
-        for match in self.type._regex.finditer(s):
+    def capture(self) -> Generator[re.Match[str], None, None]:
+        for match in self.type._regex.finditer(self.s):
             yield match
         return None
 
-    def tokenise(self, s: str) -> Generator["Token", None, None]:
-        for token in self.capture(s):
+    def tokenise(self) -> Generator["Token", None, None]:
+        for token in self.capture():
             yield Token(token=token.group(), type=self.type)
     
-    def can_tokenise(self, *, token: str) -> bool:
-        return self.type._regex.match(token) is not None
+    def can_tokenise(self) -> bool:
+        return self.type._regex.match(self.s) is not None
 
 
 class Token:
     def __init__(self, *, token: str, type: TokenType):
-        if not type.tokeniser.can_tokenise(token=token):
+        self._tokeniser = Tokeniser(s=token, type=type)
+        if not self._tokeniser.can_tokenise():
             raise ValueError(f"Invalid Token for Pattern. Token={token} Pattern={type}")
         self.type = type
         self.token = token
@@ -51,7 +49,7 @@ class Multiply(Token):
 
     def __init__(self, *, token: str):
         super().__init__(token=token, type=self.type)
-        self._capture = next(self.type.tokeniser.capture(token))
+        self._capture = next(self._tokeniser.capture())
         if len(self._capture.groups()) != 2:
             raise ValueError(f"Token needs comma separated digits: Token={token}")
         
@@ -72,9 +70,8 @@ class Multiply(Token):
     
     @classmethod
     def tokenise(cls, s: str) -> Generator["Multiply", None, None]:
-        for token in cls.type.tokeniser.capture(s):
-            yield Multiply(token=token.group())
-        
+        for token in Tokeniser(s=s, type=cls.type).tokenise():
+            yield Multiply(token=token.token)
 
 class Do(Token):
     type = TokenType.DO
