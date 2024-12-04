@@ -1,39 +1,57 @@
 import re
+from enum import StrEnum
 from typing import Generator, Iterator
 
 
-class Token:
-    def __init__(self, *, token: str, tokeniser: "Tokeniser"):
-        if not tokeniser.can_tokenise(token=token):
-            raise ValueError(f"Invalid Token for Pattern. Token={token} Pattern={tokeniser.pattern}")
-        self._tokeniser = tokeniser
-        self.token = token
+class TokenType(StrEnum):
+    MUL = r"mul\((\d+),(\d+)\)"
+    DO = r"do\(\)"
+    DONT = r"dont\(\)"
+        
+    @classmethod
+    def global_regex(cls) -> re.Pattern[str]:
+        return re.compile("|".join(r for r in cls))
+    
+    @property
+    def _regex(self) -> re.Pattern[str]:
+        return re.compile(self)
+
+    @property
+    def tokeniser(self) -> "Tokeniser":
+        return Tokeniser(type=self)
 
 
 class Tokeniser:
-    def __init__(self, *, pattern: str):
-        self.pattern = pattern
-        self._regex = re.compile(pattern)
+    def __init__(self, *, type: TokenType):
+        self.type = type
 
     def capture(self, s: str) -> Generator[re.Match[str], None, None]:
-        for match in self._regex.finditer(s):
+        for match in self.type._regex.finditer(s):
             yield match
-        raise ValueError(f"Pattern not found in Token. Token={s} Pattern={self.pattern}")
+        return None
 
-    def tokenise(self, s: str) -> Generator[Token, None, None]:
+    def tokenise(self, s: str) -> Generator["Token", None, None]:
         for token in self.capture(s):
-            yield Token(token=token.group(), tokeniser=self)
+            yield Token(token=token.group(), type=self.type)
     
     def can_tokenise(self, *, token: str) -> bool:
-        return self._regex.match(token) is not None
+        return self.type._regex.match(token) is not None
+
+
+class Token:
+    def __init__(self, *, token: str, type: TokenType):
+        if not type.tokeniser.can_tokenise(token=token):
+            raise ValueError(f"Invalid Token for Pattern. Token={token} Pattern={type}")
+        self.type = type
+        self.token = token
 
 
 class Multiply(Token):
-    tokeniser = Tokeniser(pattern=r"mul\((\d+),(\d+)\)")
+    type = TokenType.MUL
 
     def __init__(self, *, token: str):
-        super().__init__(token=token, tokeniser=self.tokeniser)
-        self._capture = next(self._tokeniser.capture(token))
+        super().__init__(token=token, type=self.type)
+        self._capture = next(self.type.tokeniser.capture(token))
         if len(self._capture.groups()) != 2:
             raise ValueError(f"Token needs comma separated digits: Token={token}")
         
@@ -54,9 +72,29 @@ class Multiply(Token):
     
     @classmethod
     def tokenise(cls, s: str) -> Generator["Multiply", None, None]:
-        for token in cls.tokeniser.capture(s):
+        for token in cls.type.tokeniser.capture(s):
             yield Multiply(token=token.group())
         
+
+class Do(Token):
+    type = TokenType.DO
+
+    def __init__(self, *, token: str):
+        super().__init__(token=token, type=self.type)
+        
+    def __str__(self) -> str:
+        return "do"
+
+
+class Dont(Token):
+    type = TokenType.DONT
+
+    def __init__(self, *, token: str):
+        super().__init__(token=token, type=self.type)
+        
+    def __str__(self) -> str:
+        return "don't"
+
 
 def main(lines: Iterator[str]) -> None:
     tokens = [token for line in lines for token in Multiply.tokenise(line)]
