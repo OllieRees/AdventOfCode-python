@@ -3,8 +3,6 @@ from enum import StrEnum
 from functools import cached_property
 from typing import Generator, Iterator, Optional
 
-from paprika import catch
-
 
 class TokenType(StrEnum):
     MUL = r"mul\((\d+),(\d+)\)"
@@ -12,10 +10,12 @@ class TokenType(StrEnum):
     DONT = r"don't\(\)"  
 
     @classmethod
-    @catch(exception=StopIteration, handler=lambda _: None)
     def from_token_str(cls, *, token: str) -> Optional["TokenType"]:
-        return next(type for type in cls if type.is_valid_token(token=token))
-    
+        try:
+            return next(type for type in cls if type.is_valid_token(token=token))
+        except StopIteration as no_type_found_err:
+            raise ValueError(f"No token type found for {token}") from no_type_found_err
+        
     @classmethod
     def tokenise_all(cls, *, token_str: str) -> Iterator["Token"]:
         return Tokeniser(token_str=token_str, pattern=re.compile("|".join(r for r in cls))).tokenise()
@@ -34,6 +34,9 @@ class TokenType(StrEnum):
                 return False
             case _:
                 return True
+            
+    def __str__(self) -> str:
+        return self.name
 
 
 class Tokeniser:
@@ -70,6 +73,8 @@ class Token:
                 return Multiply(token=self.token, is_enabled=self.is_enabled).result
         return 0
     
+    def __str__(self):
+        return f"Token <token={self.token} type={self.type}>" 
 
 class Multiply(Token):
     type = TokenType.MUL

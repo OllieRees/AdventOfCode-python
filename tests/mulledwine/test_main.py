@@ -2,40 +2,72 @@ from unittest import TestCase
 
 import pytest
 
-from mulledwine.main import Multiply, Token, Tokeniser
+from mulledwine.main import Multiply, Token, TokenType
 
 
-class TestTokeniser(TestCase):
-    def test_tokenise_no_char_skip(self) -> None:
-        next(Tokeniser(pattern=r"\d").tokenise(s="23 45")) == "2"
-        next(Tokeniser(pattern=r"\d").tokenise(s="23 45")) == "3"
-        next(Tokeniser(pattern=r"\d").tokenise(s="23 45")) == "4"
-        next(Tokeniser(pattern=r"\d").tokenise(s="23 45")) == "5"
-
-    def test_tokenise_char_skip(self) -> None:
-        assert next(Tokeniser(pattern=r"\d").tokenise(s="h1 :)")).token == "1"
-
-    def test_tokenise_no_valid_token(self) -> None:
+class TestTokenType(TestCase):
+    def test_token_type_from_str(self) -> None:
+        assert TokenType.from_token_str(token="mul(2,3)") == TokenType.MUL
+        assert TokenType.from_token_str(token="do()") == TokenType.DO
+        assert TokenType.from_token_str(token="don't()") == TokenType.DONT
+    
+    def test_token_type_from_invalid_str(self) -> None:
         with pytest.raises(ValueError):
-            next(Tokeniser(pattern=r"\d").tokenise(s="hi"))
+            TokenType.from_token_str(token="do")
 
-    def test_token_exists_in_string(self) -> None:
-        assert Tokeniser(pattern=r"\d").can_tokenise(token="23 tokens")
+    def test_valid_token(self) -> None:
+        assert TokenType.MUL.is_valid_token(token="mul(2,3)")
+        assert TokenType.DO.is_valid_token(token="do()")
+        assert TokenType.DONT.is_valid_token(token="don't()")
 
-    def test_token_doesnt_exist_in_string(self) -> None:
-        assert not Tokeniser(pattern=r"\d").can_tokenise(token="twenty-three tokens")
+    def test_valid_token_for_wrong_type(self) -> None:
+        assert not TokenType.MUL.is_valid_token(token="do()")
+        assert not TokenType.MUL.is_valid_token(token="don't()")
+        assert not TokenType.DO.is_valid_token(token="mul(2,3)")
+        assert not TokenType.DO.is_valid_token(token="don't()")        
+        assert not TokenType.DONT.is_valid_token(token="mul(2,3)")
+        assert not TokenType.DONT.is_valid_token(token="do()")
 
-    def test_no_token_given(self) -> None:
-        assert not Tokeniser(pattern=r"\d").can_tokenise(token="")
+    def test_valid_token_bad_str(self) -> None:
+        assert not TokenType.MUL.is_valid_token(token="hi team :)")
+        assert not TokenType.DO.is_valid_token(token="hi team :)")
+        assert not TokenType.DONT.is_valid_token(token="hi team :)")
+
+    def test_mul_is_enabled(self) -> None:
+        assert TokenType.MUL.is_enabled(is_enabled=True)
+        assert not TokenType.MUL.is_enabled(is_enabled=False)
+
+    def test_enabling_tokens_is_enabled(self) -> None:
+        assert TokenType.DO.is_enabled(is_enabled=True)
+        assert TokenType.DO.is_enabled(is_enabled=False)
+        assert not TokenType.DONT.is_enabled(is_enabled=True)
+        assert not TokenType.DONT.is_enabled(is_enabled=False)
+
+    def test_tokenise_all(self) -> None:
+        assert [
+            str(token) for token in TokenType.tokenise_all(token_str="xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))")
+        ] == [
+            "Token <token=mul(2,4) type=MUL>", 
+            "Token <token=don't() type=DONT>", 
+            "Token <token=mul(5,5) type=MUL>", 
+            "Token <token=mul(11,8) type=MUL>", 
+            "Token <token=do() type=DO>", 
+            "Token <token=mul(8,5) type=MUL>"
+        ]
 
 
 class TestToken(TestCase):
     def test_valid_token(self) -> None:
-        assert Token(token="2", tokeniser=Tokeniser(pattern=r"\d"))
+        assert Token(token="mul(2,3)", type=TokenType.MUL)
 
     def test_invalid_token(self) -> None:
         with pytest.raises(ValueError):
-            Token(token="hi", tokeniser=Tokeniser(pattern=r"\d"))
+            Token(token="hi", type=TokenType.MUL)
+
+    def test_result(self) -> None:
+        assert Token(token="mul(2,3)", type=TokenType.MUL).result == 6
+        assert Token(token="do()", type=TokenType.DO).result == 0
+        assert Token(token="don't()", type=TokenType.DONT).result == 0
 
 
 class TestMultiply(TestCase):
