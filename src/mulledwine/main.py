@@ -93,11 +93,6 @@ class Multiply(Token):
     @property
     def result(self) -> int:
         return self.l * self.r
-    
-    @classmethod
-    def tokenise(cls, *, token_str: str) -> Generator["Multiply", None, None]:
-        for token in cls.type.tokenise(token_str=token_str):
-            yield Multiply(token=token.token, is_enabled=token.is_enabled)
 
 
 class Do(Token):
