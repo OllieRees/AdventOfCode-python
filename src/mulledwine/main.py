@@ -1,77 +1,84 @@
 import re
 from enum import StrEnum
-from typing import Generator, Iterator
+from functools import cached_property
+from typing import Generator, Iterator, Optional
+
+from paprika import catch
 
 
 class TokenType(StrEnum):
     MUL = r"mul\((\d+),(\d+)\)"
     DO = r"do\(\)"
-    DONT = r"dont\(\)"
+    DONT = r"don't\(\)"  
 
     @classmethod
-    def global_regex(cls) -> re.Pattern[str]:
-        return re.compile("|".join(r for r in cls))
+    @catch(exception=StopIteration, handler=lambda _: None)
+    def from_token_str(cls, *, token: str) -> Optional["TokenType"]:
+        return next(type for type in cls if type.is_valid_token(token=token))
     
-    @property
-    def _regex(self) -> re.Pattern[str]:
-        return re.compile(self)
+    @classmethod
+    def tokenise_all(cls, *, token_str: str) -> Generator["Token", None, None]:
+        return Tokeniser(token_str=token_str, pattern=re.compile("|".join(r for r in cls))).tokenise()
     
+    def tokenise(self, *, token_str: str) -> Generator["Token", None, None]:
+        return Tokeniser(token_str=token_str, pattern=re.compile(self)).tokenise()
+        
+    def is_valid_token(self, *, token: str) -> bool:
+        return re.compile(self).fullmatch(token) is not None
+
 
 class Tokeniser:
-    def __init__(self, *, s: str, type: TokenType):
-        self.s = s
-        self.type = type
-
-    def capture(self) -> Generator[re.Match[str], None, None]:
-        for match in self.type._regex.finditer(self.s):
-            yield match
-        return None
-
-    def tokenise(self) -> Generator["Token", None, None]:
-        for token in self.capture():
-            yield Token(token=token.group(), type=self.type)
+    def __init__(self, token_str: str, pattern: re.Pattern[str]) -> None:
+        self.token_str = token_str
+        self.pattern = pattern
     
-    def can_tokenise(self) -> bool:
-        return self.type._regex.match(self.s) is not None
+    def tokenise(self) -> Generator["Token", None, None]:
+        for token in self.pattern.finditer(self.token_str):
+            if type := TokenType.from_token_str(token=token.group()):
+                yield Token(token=token.group(), type=type)
+        return None
 
 
 class Token:
     def __init__(self, *, token: str, type: TokenType):
-        self._tokeniser = Tokeniser(s=token, type=type)
-        if not self._tokeniser.can_tokenise():
+        if not type.is_valid_token(token=token):
             raise ValueError(f"Invalid Token for Pattern. Token={token} Pattern={type}")
         self.type = type
         self.token = token
 
+    @property
+    def args(self) -> Iterator[str]:
+        return iter(next(re.compile(self.type).finditer(self.token)).groups())
+    
 
 class Multiply(Token):
     type = TokenType.MUL
 
     def __init__(self, *, token: str):
         super().__init__(token=token, type=self.type)
-        self._capture = next(self._tokeniser.capture())
-        if len(self._capture.groups()) != 2:
-            raise ValueError(f"Token needs comma separated digits: Token={token}")
-        
+        self.l = next(self._args)
+        self.r = next(self._args)
+
     def __str__(self) -> str:
         return f"{self.l} * {self.r}"
-    
-    @property 
-    def l(self) -> int:
-        return int(self._capture.group(1))
-    
-    @property 
-    def r(self) -> int:
-        return int(self._capture.group(2))
-    
+
+    @cached_property 
+    def _args(self) -> Generator[int, None, None]:
+        for i, arg in enumerate(self.args):
+            if i >= 2:
+                raise ValueError(f"Token needs comma separated digits: Token={self.token}")
+            yield int(arg)
+        raise ValueError(f"Token needs comma separated digits: Token={self.token}")
+
     @property
     def result(self) -> int:
         return self.l * self.r
     
     @classmethod
-    def tokenise(cls, s: str) -> Generator["Multiply", None, None]:
-        for token in Tokeniser(s=s, type=cls.type).tokenise():
+    def tokenise(cls, *, token_str: str) -> Generator["Multiply", None, None]:
+        for token in cls.type.tokenise(token_str=token_str):
             yield Multiply(token=token.token)
+
 
 class Do(Token):
     type = TokenType.DO
@@ -94,5 +101,7 @@ class Dont(Token):
 
 
 def main(lines: Iterator[str]) -> None:
-    tokens = [token for line in lines for token in Multiply.tokenise(line)]
-    print(f"Token Sum: {sum(token.result for token in tokens)}")
+    tokens = [token for line in lines for token in TokenType.tokenise_all(token_str=line)]
+    print(f"Token Sum: {sum(Multiply(token=token.token).result for token in tokens if token.type == TokenType.MUL)}")
+
+    # skip any muls between a don't and a do
