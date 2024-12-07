@@ -2,6 +2,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Callable, Dict, Iterator, Tuple
 
+import ceres.main as Ceres
 import historianhysteria.main as HistorianHysteria
 import mulledwine.main as MulledWine
 import rudolphreports.main as RudolphReports
@@ -10,6 +11,7 @@ PUZZLES: Dict[Tuple[int, int], Callable[[Iterator[str]], None]] = {
     (2024, 1): HistorianHysteria.main,
     (2024, 2): RudolphReports.main,
     (2024, 3): MulledWine.main,
+    (2024, 4): Ceres.main,
 }
 
 
