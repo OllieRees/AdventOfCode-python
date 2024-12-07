@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 paprika = "*"
+numpy="*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
@@ -24,6 +25,7 @@ pythonpath = "src"
 
 [tool.mypy]
 python_version = "3.12"
+plugins = "numpy.typing.mypy_plugin"
 warn_return_any = true
 warn_unused_configs = true
 
