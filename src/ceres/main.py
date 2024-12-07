@@ -31,4 +31,3 @@ class WordSearchGrid:
 
 def main(lines: Iterator[str]) -> None:
     search_grid = WordSearchGrid(grid=np.array([list(line) for line in lines]))
-    print(search_grid.diagonals)
