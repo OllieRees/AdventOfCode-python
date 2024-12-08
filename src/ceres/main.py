@@ -22,12 +22,13 @@ class WordSearchGrid:
         return self._transpose.horizontals
     
     @property
-    def diagonals(self) -> List[str]:
+    def forward_diagonals(self) -> List[str]:
         return ["".join(self.grid.diagonal(offset=offset)) for offset in range(-len(self.grid) + 1, len(self.grid[0]))]
-
-    def search_word(self, *, word: str) -> Iterator[List[tuple[int, int]]]:
-        return iter([[(0, 0)]])
-
+    
+    @property
+    def backward_diagonals(self) -> List[str]:
+        return ["".join(np.fliplr(self.grid).diagonal(offset=offset)) for offset in range(-len(self.grid) + 1, len(self.grid[0]))]
+    
 
 def main(lines: Iterator[str]) -> None:
     search_grid = WordSearchGrid(grid=np.array([list(line) for line in lines]))
