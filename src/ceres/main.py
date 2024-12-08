@@ -30,23 +30,33 @@ class WordSearchGrid:
     def backward_diagonals(self) -> List[str]:
         return ["".join(np.fliplr(self.grid).diagonal(offset=offset)) for offset in range(-len(self.grid) + 1, len(self.grid[0]))]
     
-    def _count_horizontal(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for horizontal in self.horizontals for _ in pattern.finditer(horizontal))
+
+class WordSearchCounter:
+    def __init__(self, *, grid: WordSearchGrid) -> None:
+        self.grid= grid
+
+    def count_horizontal(self, *, pattern: re.Pattern[str]) -> int:
+        return sum(1 for horizontal in self.grid.horizontals for _ in pattern.finditer(horizontal))
     
-    def _count_vertical(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for vertical in self.verticals for _ in pattern.finditer(vertical))
+    def count_vertical(self, *, pattern: re.Pattern[str]) -> int:
+        return sum(1 for vertical in self.grid.verticals for _ in pattern.finditer(vertical))
     
-    def _count_forward_diagonal(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for diagonal in self.forward_diagonals for _ in pattern.finditer(diagonal))
+    def count_forward_diagonal(self, *, pattern: re.Pattern[str]) -> int:
+        return sum(1 for diagonal in self.grid.forward_diagonals for _ in pattern.finditer(diagonal))
     
-    def _count_backward_diagonal(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for diagonal in self.backward_diagonals for _ in pattern.finditer(diagonal))
+    def count_backward_diagonal(self, *, pattern: re.Pattern[str]) -> int:
+        return sum(1 for diagonal in self.grid.backward_diagonals for _ in pattern.finditer(diagonal))
     
-    def count_word(self, *, pattern: re.Pattern[str]) -> int:
-        return self._count_horizontal(pattern=pattern) + self._count_vertical(pattern=pattern) + self._count_forward_diagonal(pattern=pattern) + self._count_backward_diagonal(pattern=pattern)
-    
+    def count_word_occurrences(self, *, pattern: re.Pattern[str]) -> int:
+        return self.count_horizontal(pattern=pattern) + self.count_vertical(pattern=pattern) + self.count_forward_diagonal(pattern=pattern) + self.count_backward_diagonal(pattern=pattern)
+   
+    def count_grid_occurrences(self, *, grid: WordSearchGrid) -> int:
+        return 0
+
 
 def main(lines: Iterator[str]) -> None:
-    search_grid = WordSearchGrid(grid=np.array([list(line) for line in lines]))
-    pattern: re.Pattern[str] = re.compile(r"(?=(XMAS|SAMX))")
-    print(f"Number of occurrences of XMAS in the search grid: {search_grid.count_word(pattern=pattern)}")
+    counter = WordSearchCounter(grid=WordSearchGrid(grid=np.array([list(line) for line in lines])))
+    print(f"Number of occurrences of XMAS in the search grid: {counter.count_word_occurrences(pattern=re.compile(r"(?=(XMAS|SAMX))"))}")
+
+    mas_cross = np.array([[""], [""], [""]])
+    print(f"Number of occurrences of X-MAS in the search grid: {counter.count_grid_occurrences(grid=WordSearchGrid(grid=mas_cross))}")
