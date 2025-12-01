@@ -7,12 +7,26 @@ class Direction(StrEnum):
     LEFT = "L"
     RIGHT = "R"
 
+    def move(self, position: int, magnitude: int) -> int:
+        match self:
+            case Direction.LEFT:
+                return (position - magnitude) % 100
+            case Direction.RIGHT:
+                return (position + magnitude) % 100
+
+    def passes_origin_once(self, position: int, magnitude: int) -> bool:
+        match self:
+            case Direction.LEFT:
+                return (position - magnitude) <= 0 and position > 0
+            case Direction.RIGHT:
+                return position + magnitude >= 100
+
 
 class Dial:
     def __init__(self, current_position: int = 0) -> None:
         self._current_position = current_position
         self._pass_origin_count = 0
-        self._stops_at_origin = 0
+        self._stop_at_origin_count = 0
 
     @property
     def passed_origin(self) -> int:
@@ -20,7 +34,7 @@ class Dial:
 
     @property
     def stops_at_origin(self) -> int:
-        return self._stops_at_origin
+        return self._stop_at_origin_count
 
     @property
     def current_position(self) -> int:
@@ -31,27 +45,29 @@ class Dial:
         if not (0 <= value <= 99):
             raise ValueError("Position must be between 0 and 99 inclusive.")
         if value == 0:
-            self._stops_at_origin += 1
+            self._stop_at_origin_count += 1
         self._current_position = value
 
     def rotate(self, rotation: "Rotation") -> None:
-        match rotation.direction:
-            case Direction.LEFT:
-                if self.current_position == 0:
-                    self._pass_origin_count -= 1
-                self._pass_origin_count += abs((self.current_position - rotation.magnitude) // 100)
-                self.current_position = (self.current_position - rotation.magnitude) % 100
-                if self.current_position == 0:
-                    self._pass_origin_count += 1
-            case Direction.RIGHT:
-                self._pass_origin_count += abs((self.current_position + rotation.magnitude) // 100)
-                self.current_position = (self.current_position + rotation.magnitude) % 100
+        self._pass_origin_count += rotation.magnitude // 100 + int(rotation.passes_origin_once(self._current_position))
+        self._current_position = rotation.rotate(self._current_position)
 
 
 @dataclass(frozen=True, kw_only=True)
 class Rotation:
     direction: Direction
     magnitude: int
+
+    def rotate(self, position: int) -> int:
+        return self.direction.move(position, self.magnitude)
+
+    def passes_origin_once(self, position: int) -> bool:
+        return self.direction.passes_origin_once(position, self.magnitude)
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Rotation):
+            raise TypeError("Cannot compare Rotation with different type.")
+        return (self.direction, self.magnitude) == (other.direction, other.magnitude)
 
 
 class StepsConverter:
