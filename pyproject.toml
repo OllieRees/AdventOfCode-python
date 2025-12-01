@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Ollie Rees <oliver.x.rees@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -12,19 +13,19 @@ numpy="*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
-flake8 = "*"
-black = "*"
-isort = "*"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+ruff = "*"
 
 [tool.pytest.ini_options]
 pythonpath = "src"
 
+[tool.ruff]
+line-length = 130
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "R"]
+
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.13"
 plugins = "numpy.typing.mypy_plugin"
 warn_return_any = true
 warn_unused_configs = true
@@ -33,12 +34,3 @@ warn_unused_configs = true
 module = "tests.*"
 ignore_missing_imports = true
 
-[tool.flake8]
-max-line-length = 120
-
-[tool.isort]
-multi_line_output = 3  # Vertical Hanging Indent
-include_trailing_comma = true
-force_grid_wrap = 0
-line_length = 88
-profile = "black"

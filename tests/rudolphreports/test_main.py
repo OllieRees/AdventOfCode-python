@@ -38,7 +38,7 @@ class TestLevelChanges(TestCase):
 
     def test_below_range(self) -> None:
         assert not LevelChanges(levels=[3, 6, 6, 8]).within_range(1, 3)
-        
+
     def test_above_range(self) -> None:
         assert not LevelChanges(levels=[3, 6, 10, 8]).within_range(1, 3)
 
@@ -47,6 +47,7 @@ class TestLevelChanges(TestCase):
 
     def test_above_range_initially(self) -> None:
         assert not LevelChanges(levels=[3, 9, 11, 12]).within_range(1, 3)
+
 
 class TestReport(TestCase):
     def test_levels_changes(self) -> None:
