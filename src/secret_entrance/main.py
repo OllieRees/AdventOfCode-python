@@ -3,6 +3,11 @@ from enum import StrEnum
 from typing import Iterator
 
 
+class Direction(StrEnum):
+    LEFT = "L"
+    RIGHT = "R"
+
+
 class Dial:
     def __init__(self, current_position: int = 0) -> None:
         self._current_position = current_position
@@ -29,32 +34,27 @@ class Dial:
             self._stops_at_origin += 1
         self._current_position = value
 
-    def rotate(self, step: "Step") -> None:
-        match step.direction:
+    def rotate(self, rotation: "Rotation") -> None:
+        match rotation.direction:
             case Direction.LEFT:
                 if self.current_position == 0:
                     self._pass_origin_count -= 1
-                self._pass_origin_count += abs((self.current_position - step.magnitude) // 100)
-                self.current_position = (self.current_position - step.magnitude) % 100
+                self._pass_origin_count += abs((self.current_position - rotation.magnitude) // 100)
+                self.current_position = (self.current_position - rotation.magnitude) % 100
                 if self.current_position == 0:
                     self._pass_origin_count += 1
             case Direction.RIGHT:
-                self._pass_origin_count += abs((self.current_position + step.magnitude) // 100)
-                self.current_position = (self.current_position + step.magnitude) % 100
-
-
-class Direction(StrEnum):
-    LEFT = "L"
-    RIGHT = "R"
+                self._pass_origin_count += abs((self.current_position + rotation.magnitude) // 100)
+                self.current_position = (self.current_position + rotation.magnitude) % 100
 
 
 @dataclass(frozen=True, kw_only=True)
-class Step:
+class Rotation:
     direction: Direction
     magnitude: int
 
 
 class StepsConverter:
-    def from_lines(self, lines: Iterator[str]) -> Iterator[Step]:
+    def from_lines(self, lines: Iterator[str]) -> Iterator[Rotation]:
         for line in lines:
-            yield Step(direction=Direction(line[0].upper()), magnitude=int(line[1:]))
+            yield Rotation(direction=Direction(line[0].upper()), magnitude=int(line[1:]))
