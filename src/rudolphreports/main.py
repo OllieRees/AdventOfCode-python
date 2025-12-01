@@ -49,7 +49,7 @@ class Report:
         return self.level_trend.is_consistent and self.level_changes.within_range(1, 3)
 
     def _remove_level_by_index(self, *, index: int) -> "Report":
-        return Report(levels=self.levels[:index] + self.levels[(index + 1):])
+        return Report(levels=self.levels[:index] + self.levels[(index + 1) :])
 
     @property
     def dampened_reports(self) -> Generator["Report", None, None]:

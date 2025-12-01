@@ -44,15 +44,15 @@ class TestTokenType(TestCase):
         assert not TokenType.DONT.is_enabled(is_enabled=False)
 
     def test_tokenise_all(self) -> None:
-        token_str="xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
-        tokens: list[str] = [ str(token) for token in TokenType.tokenise_all(token_str=token_str) ]
+        token_str = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))"
+        tokens: list[str] = [str(token) for token in TokenType.tokenise_all(token_str=token_str)]
         assert tokens == [
             "Token <token=mul(2,4) type=MUL>",
             "Token <token=don't() type=DONT>",
             "Token <token=mul(5,5) type=MUL>",
             "Token <token=mul(11,8) type=MUL>",
             "Token <token=do() type=DO>",
-            "Token <token=mul(8,5) type=MUL>"
+            "Token <token=mul(8,5) type=MUL>",
         ]
 
 

@@ -76,6 +76,7 @@ class Token:
     def __str__(self):
         return f"Token <token={self.token} type={self.type}>"
 
+
 class Multiply(Token):
     type = TokenType.MUL
 
