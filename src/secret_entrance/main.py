@@ -10,7 +10,7 @@ class Dial:
         self._stops_at_origin = 0
 
     @property
-    def count_dial_passed_origin(self) -> int:
+    def passed_origin(self) -> int:
         return self._pass_origin_count
 
     @property

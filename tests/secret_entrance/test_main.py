@@ -31,31 +31,31 @@ class TestLeftRotation(TestCase):
         self.dial.current_position = 1
         self.dial.rotate(Step(direction=Direction.LEFT, magnitude=2))
         self.assertEqual(self.dial.current_position, 99)
-        self.assertEqual(self.dial.count_dial_passed_origin, 1)
+        self.assertEqual(self.dial.passed_origin, 1)
 
     def test_rotate_left_ends_on_origin(self) -> None:
         self.dial.current_position = 1
         self.dial.rotate(Step(direction=Direction.LEFT, magnitude=1))
         self.assertEqual(self.dial.current_position, 0)
-        self.assertEqual(self.dial.count_dial_passed_origin, 1)
+        self.assertEqual(self.dial.passed_origin, 1)
 
     def test_rotate_left_passes_origin_multiple_times(self) -> None:
         self.dial.current_position = 1
         self.dial.rotate(Step(direction=Direction.LEFT, magnitude=201))
         self.assertEqual(self.dial.current_position, 0)
-        self.assertEqual(self.dial.count_dial_passed_origin, 3)
+        self.assertEqual(self.dial.passed_origin, 3)
 
     def test_rotate_left_starts_at_0(self) -> None:
         self.dial.current_position = 0
         self.dial.rotate(Step(direction=Direction.LEFT, magnitude=1))
         self.assertEqual(self.dial.current_position, 99)
-        self.assertEqual(self.dial.count_dial_passed_origin, 0)
+        self.assertEqual(self.dial.passed_origin, 0)
 
     def test_rotate_left_starts_ends_passes_origin(self) -> None:
         self.dial.current_position = 0
         self.dial.rotate(Step(direction=Direction.LEFT, magnitude=200))
         self.assertEqual(self.dial.current_position, 0)
-        self.assertEqual(self.dial.count_dial_passed_origin, 2)
+        self.assertEqual(self.dial.passed_origin, 2)
 
 
 class TestRightRotation(TestCase):
@@ -66,25 +66,25 @@ class TestRightRotation(TestCase):
         self.dial.current_position = 99
         self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=2))
         self.assertEqual(self.dial.current_position, 1)
-        self.assertEqual(self.dial.count_dial_passed_origin, 1)
+        self.assertEqual(self.dial.passed_origin, 1)
 
     def test_rotate_right_ends_on_origin(self) -> None:
         self.dial.current_position = 99
         self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=1))
         self.assertEqual(self.dial.current_position, 0)
-        self.assertEqual(self.dial.count_dial_passed_origin, 1)
+        self.assertEqual(self.dial.passed_origin, 1)
 
     def test_rotate_right_passes_origin_multiple_times(self) -> None:
         self.dial.current_position = 99
         self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=201))
         self.assertEqual(self.dial.current_position, 0)
-        self.assertEqual(self.dial.count_dial_passed_origin, 3)
+        self.assertEqual(self.dial.passed_origin, 3)
 
     def test_rotate_right_starts_at_0(self) -> None:
         self.dial.current_position = 0
         self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=1))
         self.assertEqual(self.dial.current_position, 1)
-        self.assertEqual(self.dial.count_dial_passed_origin, 0)
+        self.assertEqual(self.dial.passed_origin, 0)
 
 
 class StepsConvertor(TestCase):
