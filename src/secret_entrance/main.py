@@ -32,8 +32,12 @@ class Dial:
     def rotate(self, step: "Step") -> None:
         match step.direction:
             case Direction.LEFT:
+                if self.current_position == 0:
+                    self._pass_origin_count -= 1
                 self._pass_origin_count += abs((self.current_position - step.magnitude) // 100)
                 self.current_position = (self.current_position - step.magnitude) % 100
+                if self.current_position == 0:
+                    self._pass_origin_count += 1
             case Direction.RIGHT:
                 self._pass_origin_count += abs((self.current_position + step.magnitude) // 100)
                 self.current_position = (self.current_position + step.magnitude) % 100
