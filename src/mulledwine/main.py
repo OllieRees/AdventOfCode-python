@@ -7,7 +7,7 @@ from typing import Generator, Iterator, Optional
 class TokenType(StrEnum):
     MUL = r"mul\((\d+),(\d+)\)"
     DO = r"do\(\)"
-    DONT = r"don't\(\)"  
+    DONT = r"don't\(\)"
 
     @classmethod
     def from_token_str(cls, *, token: str) -> Optional["TokenType"]:
@@ -15,17 +15,17 @@ class TokenType(StrEnum):
             return next(type for type in cls if type.is_valid_token(token=token))
         except StopIteration as no_type_found_err:
             raise ValueError(f"No token type found for {token}") from no_type_found_err
-        
+
     @classmethod
     def tokenise_all(cls, *, token_str: str) -> Iterator["Token"]:
         return Tokeniser(token_str=token_str, pattern=re.compile("|".join(r for r in cls))).tokenise()
-    
+
     def tokenise(self, *, token_str: str) -> Iterator["Token"]:
         return Tokeniser(token_str=token_str, pattern=re.compile(self)).tokenise()
-        
+
     def is_valid_token(self, *, token: str) -> bool:
         return re.compile(self).fullmatch(token) is not None
-    
+
     def is_enabled(self, *, is_enabled: bool) -> bool:
         match self:
             case TokenType.MUL:
@@ -34,7 +34,7 @@ class TokenType(StrEnum):
                 return False
             case _:
                 return True
-            
+
     def __str__(self) -> str:
         return self.name
 
@@ -43,7 +43,7 @@ class Tokeniser:
     def __init__(self, token_str: str, pattern: re.Pattern[str]) -> None:
         self.token_str = token_str
         self.pattern = pattern
-    
+
     def tokenise(self) -> Iterator["Token"]:
         rv = []
         is_enabled = True
@@ -52,7 +52,7 @@ class Tokeniser:
                 is_enabled = type.is_enabled(is_enabled=is_enabled)
                 rv.append(Token(token=token.group(), type=type, is_enabled=is_enabled))
         return iter(rv)
-    
+
 
 class Token:
     def __init__(self, *, token: str, type: TokenType, is_enabled: bool = True):
@@ -65,16 +65,16 @@ class Token:
     @property
     def args(self) -> Iterator[str]:
         return iter(next(re.compile(self.type).finditer(self.token)).groups())
-    
+
     @property
     def result(self) -> int:
         match self.type:
             case TokenType.MUL:
                 return Multiply(token=self.token, is_enabled=self.is_enabled).result
         return 0
-    
+
     def __str__(self):
-        return f"Token <token={self.token} type={self.type}>" 
+        return f"Token <token={self.token} type={self.type}>"
 
 class Multiply(Token):
     type = TokenType.MUL
@@ -87,7 +87,7 @@ class Multiply(Token):
     def __str__(self) -> str:
         return f"{self.l} * {self.r}"
 
-    @cached_property 
+    @cached_property
     def _args(self) -> Generator[int, None, None]:
         for i, arg in enumerate(self.args):
             if i >= 2:
@@ -105,7 +105,7 @@ class Do(Token):
 
     def __init__(self, *, token: str):
         super().__init__(token=token, type=self.type, is_enabled=True)
-        
+
     def __str__(self) -> str:
         return "do"
 
@@ -115,7 +115,7 @@ class Dont(Token):
 
     def __init__(self, *, token: str):
         super().__init__(token=token, type=self.type, is_enabled=False)
-        
+
     def __str__(self) -> str:
         return "don't"
 

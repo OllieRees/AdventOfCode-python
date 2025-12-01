@@ -20,13 +20,13 @@ class TestPuzzle(TestCase):
     def test_bad_year_day(self) -> None:
         with pytest.raises(ValueError, match="No puzzle found for year and day. Year=2000 Day=1"):
             Puzzle(year=2000, day=1)
-            
+
     def test_executor_exists(self) -> None:
-        assert Puzzle(year=2024, day=1)._executor 
-  
+        assert Puzzle(year=2024, day=1)._executor
+
     def test_executor_does_not_exist(self) -> None:
         with pytest.raises(ValueError, match="No puzzle found for year and day. Year=2000 Day=1"):
-            assert Puzzle(year=2000, day=1)._executor 
+            assert Puzzle(year=2000, day=1)._executor
 
 
 class TestPuzzleInput(TestCase):
