@@ -6,6 +6,16 @@ from typing import Iterator
 class Dial:
     def __init__(self, current_position: int = 0) -> None:
         self._current_position = current_position
+        self._pass_origin_count = 0
+        self._stops_at_origin = 0
+
+    @property
+    def count_dial_passed_origin(self) -> int:
+        return self._pass_origin_count
+
+    @property
+    def stops_at_origin(self) -> int:
+        return self._stops_at_origin
 
     @property
     def current_position(self) -> int:
@@ -15,20 +25,18 @@ class Dial:
     def current_position(self, value: int) -> None:
         if not (0 <= value <= 99):
             raise ValueError("Position must be between 0 and 99 inclusive.")
+        if value == 0:
+            self._stops_at_origin += 1
         self._current_position = value
 
     def rotate(self, step: "Step") -> None:
         match step.direction:
             case Direction.LEFT:
+                self._pass_origin_count += abs((self.current_position - step.magnitude) // 100)
                 self.current_position = (self.current_position - step.magnitude) % 100
             case Direction.RIGHT:
+                self._pass_origin_count += abs((self.current_position + step.magnitude) // 100)
                 self.current_position = (self.current_position + step.magnitude) % 100
-            case _:
-                raise ValueError("Invalid direction.")
-
-    def rotate_new_position(self, step: "Step") -> int:
-        self.rotate(step)
-        return self.current_position
 
 
 class Direction(StrEnum):

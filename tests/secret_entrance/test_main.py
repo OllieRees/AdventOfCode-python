@@ -27,9 +27,35 @@ class TestDial(TestCase):
         self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=15))
         self.assertEqual(self.dial.current_position, 10)
 
-    def test_rotate_new_position(self):
-        pos = self.dial.rotate_new_position(Step(direction=Direction.RIGHT, magnitude=1))
-        self.assertEqual(pos, 1)
+    def test_rotation_left_passes_origin(self):
+        self.dial.current_position = 5
+        self.dial.rotate(Step(direction=Direction.LEFT, magnitude=10))
+        self.assertEqual(self.dial.count_dial_passed_origin, 1)
+
+    def test_rotation_left_passes_origin_twice(self):
+        self.dial.current_position = 5
+        self.dial.rotate(Step(direction=Direction.LEFT, magnitude=106))
+        self.assertEqual(self.dial.count_dial_passed_origin, 2)
+
+    def test_rotation_left_does_not_passes_origin(self):
+        self.dial.current_position = 5
+        self.dial.rotate(Step(direction=Direction.LEFT, magnitude=4))
+        self.assertEqual(self.dial.count_dial_passed_origin, 0)
+
+    def test_rotation_right_passes_origin(self):
+        self.dial.current_position = 5
+        self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=99))
+        self.assertEqual(self.dial.count_dial_passed_origin, 1)
+
+    def test_rotation_right_passes_origin_twice(self):
+        self.dial.current_position = 5
+        self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=195))
+        self.assertEqual(self.dial.count_dial_passed_origin, 2)
+
+    def test_rotation_right_does_not_passes_origin(self):
+        self.dial.current_position = 5
+        self.dial.rotate(Step(direction=Direction.RIGHT, magnitude=94))
+        self.assertEqual(self.dial.count_dial_passed_origin, 0)
 
     def test_set_position_too_small(self):
         with pytest.raises(ValueError):
