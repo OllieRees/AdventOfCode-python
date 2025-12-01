@@ -8,7 +8,7 @@ from ceres.main import WordSearchGrid
 class TestWordSearchGrid(TestCase):
     def setUp(self):
         self.even_grid = np.array([list("abc"), list("def"), list("ghi")])
-        self.uneven_grid = np.array([list("abcd"), list("efgh"), list("ijkl")])   
+        self.uneven_grid = np.array([list("abcd"), list("efgh"), list("ijkl")])
 
     def test_horizontals_square_grid(self) -> None:
         WordSearchGrid(grid=self.even_grid).horizontals == ["abc", "def", "ghi"]
