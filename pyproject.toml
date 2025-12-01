@@ -23,7 +23,6 @@ line-length = 130
 [tool.ruff.lint]
 select = ["E", "F", "W", "R"]
 
-
 [tool.mypy]
 python_version = "3.13"
 warn_return_any = true

@@ -13,14 +13,11 @@ class Step:
     direction: Direction
     magnitude: int
 
-    def __str__(self) -> str:
-        return f"{self.direction}{self.magnitude}"
-
 
 class StepsConverter:
     def from_lines(self, lines: Iterator[str]) -> Iterator[Step]:
         for line in lines:
-            yield Step(line[0].upper(), int(line[1:]))
+            yield Step(direction=line[0].upper(), magnitude=int(line[1:]))
 
 
 def main(lines: Iterator[str]) -> None:

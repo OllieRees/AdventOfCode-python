@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from src import secret_entrance as SecretEntrance
+from secret_entrance import main as SecretEntrance
 
 
 def main(lines: Iterator[str]) -> None:
