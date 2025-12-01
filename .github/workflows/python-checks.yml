@@ -3,7 +3,13 @@
 
 name: Python application
 
-on: ["push"]
+on:
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
