@@ -20,12 +20,15 @@ class Dial:
     def rotate(self, step: "Step") -> None:
         match step.direction:
             case Direction.LEFT:
-                new_position = (self.current_position - step.magnitude) % 100
+                self.current_position = (self.current_position - step.magnitude) % 100
             case Direction.RIGHT:
-                new_position = (self.current_position + step.magnitude) % 100
+                self.current_position = (self.current_position + step.magnitude) % 100
             case _:
                 raise ValueError("Invalid direction.")
-        self._current_position = new_position
+
+    def rotate_new_position(self, step: "Step") -> int:
+        self.rotate(step)
+        return self.current_position
 
 
 class Direction(StrEnum):
