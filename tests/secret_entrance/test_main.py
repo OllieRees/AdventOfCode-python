@@ -113,6 +113,12 @@ class TestDirection(TestCase):
         self.assertTrue(Direction.RIGHT.passes_origin_once(90, 10))
 
 
+class TestRotation:
+    def test_negative_magnitude(self) -> None:
+        with pytest.raises(ValueError):
+            Rotation(direction=Direction.LEFT, magnitude=-1)
+
+
 class StepsConvertor(TestCase):
     def test_from_lines(self) -> None:
         lines = ["L10", "R20", "L30"]

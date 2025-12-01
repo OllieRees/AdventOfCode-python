@@ -9,4 +9,4 @@ def main(lines: Iterator[str]) -> None:
     for step in steps:
         dial.rotate(step)
     print(dial.stops_at_origin)
-    print(dial.count_dial_passed_origin)
+    print(dial.passed_origin)

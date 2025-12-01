@@ -50,13 +50,17 @@ class Dial:
 
     def rotate(self, rotation: "Rotation") -> None:
         self._pass_origin_count += rotation.magnitude // 100 + int(rotation.passes_origin_once(self._current_position))
-        self._current_position = rotation.rotate(self._current_position)
+        self.current_position = rotation.rotate(self._current_position)
 
 
 @dataclass(frozen=True, kw_only=True)
 class Rotation:
     direction: Direction
     magnitude: int
+
+    def __post_init__(self):
+        if self.magnitude < 0:
+            raise ValueError("magnitude must be positive")
 
     def rotate(self, position: int) -> int:
         return self.direction.move(position, self.magnitude)
