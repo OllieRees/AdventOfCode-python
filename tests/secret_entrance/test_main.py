@@ -87,6 +87,32 @@ class TestRightRotation(TestCase):
         self.assertEqual(self.dial.passed_origin, 0)
 
 
+class TestDirection(TestCase):
+    def test_left_move_not_past_origin(self) -> None:
+        self.assertEqual(Direction.LEFT.move(10, 9), 1)
+        self.assertFalse(Direction.LEFT.passes_origin_once(10, 9))
+
+    def test_left_move_past_origin(self) -> None:
+        self.assertEqual(Direction.LEFT.move(10, 11), 99)
+        self.assertTrue(Direction.LEFT.passes_origin_once(10, 11))
+
+    def test_left_move_to_origin(self) -> None:
+        self.assertEqual(Direction.LEFT.move(10, 10), 0)
+        self.assertTrue(Direction.LEFT.passes_origin_once(10, 10))
+
+    def test_right_move_not_past_origin(self) -> None:
+        self.assertEqual(Direction.RIGHT.move(90, 9), 99)
+        self.assertFalse(Direction.RIGHT.passes_origin_once(90, 9))
+
+    def test_right_move_past_origin(self) -> None:
+        self.assertEqual(Direction.RIGHT.move(90, 11), 1)
+        self.assertTrue(Direction.RIGHT.passes_origin_once(90, 11))
+
+    def test_right_move_to_origin(self) -> None:
+        self.assertEqual(Direction.RIGHT.move(90, 10), 0)
+        self.assertTrue(Direction.RIGHT.passes_origin_once(90, 10))
+
+
 class StepsConvertor(TestCase):
     def test_from_lines(self) -> None:
         lines = ["L10", "R20", "L30"]
