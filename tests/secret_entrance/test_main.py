@@ -45,17 +45,29 @@ class TestLeftRotation(TestCase):
         self.assertEqual(self.dial.current_position, 0)
         self.assertEqual(self.dial.passed_origin, 3)
 
-    def test_rotate_left_starts_at_0(self) -> None:
+    def test_rotate_left_starts_at_origin(self) -> None:
         self.dial.current_position = 0
         self.dial.rotate(Rotation(direction=Direction.LEFT, magnitude=1))
         self.assertEqual(self.dial.current_position, 99)
         self.assertEqual(self.dial.passed_origin, 0)
+
+    def test_rotate_left_starts_and_passes_origin(self) -> None:
+        self.dial.current_position = 0
+        self.dial.rotate(Rotation(direction=Direction.LEFT, magnitude=101))
+        self.assertEqual(self.dial.current_position, 99)
+        self.assertEqual(self.dial.passed_origin, 1)
 
     def test_rotate_left_starts_ends_passes_origin(self) -> None:
         self.dial.current_position = 0
         self.dial.rotate(Rotation(direction=Direction.LEFT, magnitude=200))
         self.assertEqual(self.dial.current_position, 0)
         self.assertEqual(self.dial.passed_origin, 2)
+
+    def test_rotate_left_magnitude_larger_than_100(self) -> None:
+        self.dial.current_position = 50
+        self.dial.rotate(Rotation(direction=Direction.LEFT, magnitude=1000))
+        self.assertEqual(self.dial.current_position, 50)
+        self.assertEqual(self.dial.passed_origin, 10)
 
 
 class TestRightRotation(TestCase):
@@ -80,11 +92,29 @@ class TestRightRotation(TestCase):
         self.assertEqual(self.dial.current_position, 0)
         self.assertEqual(self.dial.passed_origin, 3)
 
-    def test_rotate_right_starts_at_0(self) -> None:
+    def test_rotate_right_starts_at_origin(self) -> None:
         self.dial.current_position = 0
         self.dial.rotate(Rotation(direction=Direction.RIGHT, magnitude=1))
         self.assertEqual(self.dial.current_position, 1)
         self.assertEqual(self.dial.passed_origin, 0)
+
+    def test_rotate_right_starts_and_passes_origin(self) -> None:
+        self.dial.current_position = 0
+        self.dial.rotate(Rotation(direction=Direction.RIGHT, magnitude=101))
+        self.assertEqual(self.dial.current_position, 1)
+        self.assertEqual(self.dial.passed_origin, 1)
+
+    def test_rotate_right_starts_ends_passes_origin(self) -> None:
+        self.dial.current_position = 0
+        self.dial.rotate(Rotation(direction=Direction.RIGHT, magnitude=200))
+        self.assertEqual(self.dial.current_position, 0)
+        self.assertEqual(self.dial.passed_origin, 2)
+
+    def test_rotate_right_magnitude_larger_than_100(self) -> None:
+        self.dial.current_position = 50
+        self.dial.rotate(Rotation(direction=Direction.RIGHT, magnitude=1000))
+        self.assertEqual(self.dial.current_position, 50)
+        self.assertEqual(self.dial.passed_origin, 10)
 
 
 class TestDirection(TestCase):

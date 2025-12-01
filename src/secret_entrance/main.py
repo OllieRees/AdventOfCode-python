@@ -15,9 +15,12 @@ class Direction(StrEnum):
                 return (position + magnitude) % 100
 
     def passes_origin_once(self, position: int, magnitude: int) -> bool:
+        if position == 0:
+            return False
+        magnitude = magnitude % 100
         match self:
             case Direction.LEFT:
-                return (position - magnitude) <= 0 and position > 0
+                return position - magnitude <= 0
             case Direction.RIGHT:
                 return position + magnitude >= 100
 
