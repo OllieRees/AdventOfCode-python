@@ -18,6 +18,7 @@ PUZZLES: Dict[Tuple[int, int], Callable[[Iterator[str]], None]] = {
 class InputMode(StrEnum):
     PRACTICE = "practice"
     REAL = "real"
+    BIGBOY = "bigboy"
 
 
 class Puzzle:
