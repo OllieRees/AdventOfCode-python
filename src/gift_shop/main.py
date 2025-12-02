@@ -2,12 +2,12 @@ from functools import cached_property
 
 
 class ProductID:
-    def __init__(self, id: str) -> None:
-        self._id = id
+    def __init__(self, id: int) -> None:
+        self._id = str(id)
 
     @cached_property
-    def id_(self) -> str:
-        return self._id
+    def id_(self) -> int:
+        return int(self._id)
 
     @cached_property
     def digit_count(self) -> int:
@@ -25,5 +25,5 @@ class ProductIDRange:
         self.end = end
 
     @property
-    def largest_repeating_number_from_terminals(self) -> int:
+    def repeating_numbers_from_range(self) -> int:
         return 0
