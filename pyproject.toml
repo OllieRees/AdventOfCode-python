@@ -13,6 +13,7 @@ paprika = "*"
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 ruff = "*"
+mypy = "*"
 
 [tool.pytest.ini_options]
 pythonpath = "src"
