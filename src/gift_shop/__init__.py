@@ -8,4 +8,4 @@ def main(lines: Iterator[str]) -> None:
     line = next(lines)
     for range in line.split(","):
         start, end = range.strip().split("-", 1)
-        rv.append(ProductIDRange(start=ProductID(start), end=ProductID(end)))
+        rv.append(ProductIDRange(start=ProductID(int(start)), end=ProductID(int(end))))
