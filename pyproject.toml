@@ -26,6 +26,7 @@ select = ["E", "F", "W", "R"]
 
 [tool.mypy]
 python_version = "3.13"
+disable_error_code = ["import-untyped"]
 warn_return_any = true
 warn_unused_configs = true
 
