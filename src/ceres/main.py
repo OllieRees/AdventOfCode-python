@@ -1,73 +1,101 @@
 import re
-from functools import cached_property
-from typing import Iterator, List, Tuple
+from dataclasses import dataclass
+from typing import Iterator, List
 
-import numpy as np
+
+class Word:
+    def __init__(self, value: str) -> None:
+        self.word = value
+
+
+@dataclass(frozen=True, kw_only=True)
+class GridBox:
+    val: str
+    x: int
+    y: int
+
+    def __post_init__(self):
+        if len(self.val) != 1:
+            raise TypeError("GridBox only supports characters")
+
+    def __str__(self) -> str:
+        return f"{self.val}: ({self.x}, {self.y})"
+
+
+class GridLine:
+    def __init__(self, value: List[GridBox]) -> None:
+        self._value = value
+
+    def __str__(self) -> str:
+        return "".join(v.val for v in self._value)
+
+    def search_word(self, word: Word) -> Iterator[List[GridBox]]:
+        for m in re.finditer(word.word, str(self)):
+            yield self._value[m.start() : m.end()]
+        for m in re.finditer(word.word[::-1], str(self)):
+            yield self._value[m.start() : m.end()]
+
+
+class Grid:
+    def __init__(self, lines: Iterator[str]) -> None:
+        self._lines: list[str] = list(lines)
+
+    def __create_box_from_coords(self, x: int, y: int) -> GridBox:
+        return GridBox(val=self._lines[x][y], x=x, y=y)
+
+    @property
+    def column_count(self) -> int:
+        return len(self._lines[0])
+
+    @property
+    def row_count(self) -> int:
+        return len(self._lines)
+
+    @property
+    def horizontal_lines(self) -> List[GridLine]:
+        return [GridLine([GridBox(val=c, x=i, y=j) for j, c in enumerate(line)]) for i, line in enumerate(self._lines)]
+
+    @property
+    def vertical_lines(self) -> List[GridLine]:
+        rv = []
+        for j in range(self.column_count):
+            rv.append(GridLine([GridBox(val=self._lines[i][j], x=i, y=j) for i in range(self.row_count)]))
+        return rv
+
+    @property
+    def forward_diagonals(self) -> List[GridLine]:
+        rv = [GridLine([self.__create_box_from_coords(x=i, y=i) for i in range(self.column_count)])]
+        for offset in range(1, self.row_count):
+            rv.append(GridLine([self.__create_box_from_coords(x=i + offset, y=i) for i in range(self.column_count - offset)]))
+            rv.append(GridLine([self.__create_box_from_coords(x=i, y=i + offset) for i in range(self.row_count - offset)]))
+        return rv
+
+    @property
+    def backward_diagonals(self) -> List[GridLine]:
+        rv = [GridLine([self.__create_box_from_coords(x=i, y=-(i + 1)) for i in range(self.column_count)])]
+        for offset in range(1, self.row_count):
+            rv.append(
+                GridLine([self.__create_box_from_coords(x=offset + i, y=-(i + 1)) for i in range(self.column_count - offset)])
+            )
+            rv.append(GridLine([self.__create_box_from_coords(x=i, y=-(i + 1 + offset)) for i in range(self.row_count - offset)]))
+        return rv
 
 
 class WordSearchGrid:
-    def __init__(self, *, grid: np.typing.NDArray[List[List[str]]]):
+    def __init__(self, *, grid: Grid, word: Word) -> None:
         self.grid = grid
+        self.word = word
 
-    @cached_property
-    def _transpose(self) -> "WordSearchGrid":
-        return WordSearchGrid(grid=self.grid.T)
-
-    @property
-    def horizontals(self) -> List[str]:
-        return ["".join(row) for row in self.grid]
-
-    @property
-    def verticals(self) -> List[str]:
-        return self._transpose.horizontals
-
-    @property
-    def forward_diagonals(self) -> List[str]:
-        return ["".join(self.grid.diagonal(offset=offset)) for offset in range(-len(self.grid) + 1, len(self.grid[0]))]
-
-    @property
-    def backward_diagonals(self) -> List[str]:
-        return ["".join(np.fliplr(self.grid).diagonal(offset=offset)) for offset in range(-len(self.grid) + 1, len(self.grid[0]))]
-
-    def partition_grid(self, *, partition_size: Tuple[int, int]) -> List["WordSearchGrid"]:
-        return [WordSearchGrid(grid=p) for ps in np.lib.stride_tricks.sliding_window_view(self.grid, partition_size) for p in ps]
-
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, WordSearchGrid):
-            return False
-        return bool((self.grid == other.grid).all())
-
-
-class WordSearchCounter:
-    def __init__(self, *, grid: WordSearchGrid) -> None:
-        self.grid = grid
-
-    def count_horizontal(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for horizontal in self.grid.horizontals for _ in pattern.finditer(horizontal))
-
-    def count_vertical(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for vertical in self.grid.verticals for _ in pattern.finditer(vertical))
-
-    def count_forward_diagonal(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for diagonal in self.grid.forward_diagonals for _ in pattern.finditer(diagonal))
-
-    def count_backward_diagonal(self, *, pattern: re.Pattern[str]) -> int:
-        return sum(1 for diagonal in self.grid.backward_diagonals for _ in pattern.finditer(diagonal))
-
-    def count_pattern_occurrences(self, *, pattern: re.Pattern[str]) -> int:
-        return (
-            self.count_horizontal(pattern=pattern)
-            + self.count_vertical(pattern=pattern)
-            + self.count_forward_diagonal(pattern=pattern)
-            + self.count_backward_diagonal(pattern=pattern)
-        )
-
-    def count_grid_occurrences(self, *, grid: WordSearchGrid) -> int:
-        return sum(1 for partition in self.grid.partition_grid(partition_size=grid.grid.shape) if partition == grid)
-
-
-def main(lines: Iterator[str]) -> None:
-    grid = WordSearchGrid(grid=np.array([list(line) for line in lines]))
-    counter = WordSearchCounter(grid=grid)
-    count = counter.count_pattern_occurrences(pattern=re.compile(r"(?=(XMAS|SAMX))"))
-    print(f"Number of occurrences of XMAS in the search grid: {count}")
+    def word_positions(self) -> Iterator[List[GridBox]]:
+        for line in self.grid.horizontal_lines:
+            for occurrence in line.search_word(self.word):
+                yield occurrence
+        for line in self.grid.vertical_lines:
+            for occurrence in line.search_word(self.word):
+                yield occurrence
+        for line in self.grid.forward_diagonals:
+            for occurrence in line.search_word(self.word):
+                yield occurrence
+        for line in self.grid.backward_diagonals:
+            for occurrence in line.search_word(self.word):
+                yield occurrence

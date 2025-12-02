@@ -2,7 +2,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Callable, Dict, Iterator, Tuple
 
-import ceres.main as Ceres
+import ceres as Ceres
 import historianhysteria.main as HistorianHysteria
 import mulledwine.main as MulledWine
 import rudolphreports.main as RudolphReports

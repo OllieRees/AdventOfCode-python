@@ -12,5 +12,5 @@ if __name__ == "__main__":
     try:
         puzzle.run(InputMode.BIGBOY)
     except FileNotFoundError:
-        print("No big boy for year {year}, day {day}")
+        print(f"No big boy for year {year}, day {day}")
     print("-------------------------------------------")
