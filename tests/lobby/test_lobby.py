@@ -50,29 +50,31 @@ class TestBank(TestCase):
         bank = Bank([Battery(int(x)) for x in "234234234234287"])
         self.assertEqual(bank.size, 15)
 
+
+class TestBankBinaryTree(TestCase):
     def test_all_ascending_voltage(self) -> None:
         bank = Bank([Battery(int(x)) for x in "234"])
-        self.assertEqual(bank.bank_heap.root.voltage, 2)
-        self.assertEqual(bank.bank_heap.right.root.voltage, 3)
-        self.assertEqual(bank.bank_heap.right.right.root.voltage, 4)
-        self.assertIsNone(bank.bank_heap.left)
+        self.assertEqual(bank.bank_binary_tree.root.voltage, 2)
+        self.assertEqual(bank.bank_binary_tree.right.root.voltage, 3)
+        self.assertEqual(bank.bank_binary_tree.right.right.root.voltage, 4)
+        self.assertIsNone(bank.bank_binary_tree.left)
 
     def test_all_descending_voltage(self) -> None:
         bank = Bank([Battery(int(x)) for x in "432"])
-        self.assertEqual(bank.bank_heap.root.voltage, 4)
-        self.assertEqual(bank.bank_heap.left.root.voltage, 3)
-        self.assertEqual(bank.bank_heap.left.left.root.voltage, 2)
-        self.assertIsNone(bank.bank_heap.right)
+        self.assertEqual(bank.bank_binary_tree.root.voltage, 4)
+        self.assertEqual(bank.bank_binary_tree.left.root.voltage, 3)
+        self.assertEqual(bank.bank_binary_tree.left.left.root.voltage, 2)
+        self.assertIsNone(bank.bank_binary_tree.right)
 
     def test_same_voltage(self) -> None:
         bank = Bank([Battery(int(x)) for x in "44"])
-        self.assertEqual(bank.bank_heap.root.voltage, 4)
-        self.assertEqual(bank.bank_heap.left.root.voltage, 4)
-        self.assertIsNone(bank.bank_heap.right)
+        self.assertEqual(bank.bank_binary_tree.root.voltage, 4)
+        self.assertEqual(bank.bank_binary_tree.left.root.voltage, 4)
+        self.assertIsNone(bank.bank_binary_tree.right)
 
     def test_largest_voltage_in_middle(self) -> None:
         bank = Bank([Battery(int(x)) for x in "4981"])
-        self.assertEqual(bank.bank_heap.root.voltage, 4)
-        self.assertEqual(bank.bank_heap.left.root.voltage, 1)
-        self.assertEqual(bank.bank_heap.right.root.voltage, 9)
-        self.assertEqual(bank.bank_heap.right.left.root.voltage, 8)
+        self.assertEqual(bank.bank_binary_tree.root.voltage, 4)
+        self.assertEqual(bank.bank_binary_tree.left.root.voltage, 1)
+        self.assertEqual(bank.bank_binary_tree.right.root.voltage, 9)
+        self.assertEqual(bank.bank_binary_tree.right.left.root.voltage, 8)

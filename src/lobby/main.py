@@ -55,7 +55,7 @@ class Bank:
         return len(self.batteries)
 
     @property
-    def bank_heap(self) -> "BankBinaryTree":
+    def bank_binary_tree(self) -> "BankBinaryTree":
         return BankBinaryTree(bank=self)
 
 
