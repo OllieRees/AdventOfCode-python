@@ -4,6 +4,7 @@ from typing import Callable, Dict, Iterator, Tuple
 
 import gift_shop as GiftShop
 import historianhysteria.main as HistorianHysteria
+import lobby as Lobby
 import mulledwine.main as MulledWine
 import rudolphreports.main as RudolphReports
 import secret_entrance as SecretEntrance
@@ -14,6 +15,7 @@ PUZZLES: Dict[Tuple[int, int], Callable[[Iterator[str]], None]] = {
     (2024, 3): MulledWine.main,
     (2025, 1): SecretEntrance.main,
     (2025, 2): GiftShop.main,
+    (2025, 3): Lobby.main,
 }
 
 
