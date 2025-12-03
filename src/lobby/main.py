@@ -1,4 +1,4 @@
-from typing import Iterator, List, Tuple
+from typing import List, Optional
 
 
 class Battery:
@@ -54,5 +54,27 @@ class Bank:
     def size(self) -> int:
         return len(self.batteries)
 
-    def sorted_battery_positions(self) -> Iterator[Tuple[int, Battery]]:
-        return iter(sorted(enumerate(self.batteries), key=lambda x: x[1], reverse=True))
+    @property
+    def bank_heap(self) -> "BankBinaryTree":
+        return BankBinaryTree(bank=self)
+
+
+class BankBinaryTree:
+    def __init__(self, *, bank: Bank) -> None:
+        self._bank = bank
+
+    @property
+    def root(self) -> Battery:
+        return self._bank.batteries[0]
+
+    @property
+    def left(self) -> Optional["BankBinaryTree"]:
+        if batteries := [b for b in self._bank.batteries[1:] if b.voltage <= self.root.voltage]:
+            return BankBinaryTree(bank=Bank(batteries=batteries))
+        return None
+
+    @property
+    def right(self) -> Optional["BankBinaryTree"]:
+        if batteries := [b for b in self._bank.batteries[1:] if b.voltage > self.root.voltage]:
+            return BankBinaryTree(bank=Bank(batteries=batteries))
+        return None
