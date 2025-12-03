@@ -50,27 +50,29 @@ class TestBank(TestCase):
         bank = Bank([Battery(int(x)) for x in "234234234234287"])
         self.assertEqual(bank.size, 15)
 
-    def test_bank_tree_no_left_branch(self) -> None:
-        bank = Bank([Battery(int(x)) for x in "234334334334387"])
+    def test_all_ascending_voltage(self) -> None:
+        bank = Bank([Battery(int(x)) for x in "234"])
         self.assertEqual(bank.bank_heap.root.voltage, 2)
         self.assertEqual(bank.bank_heap.right.root.voltage, 3)
+        self.assertEqual(bank.bank_heap.right.right.root.voltage, 4)
         self.assertIsNone(bank.bank_heap.left)
 
-    def test_bank_tree_no_right_branch(self) -> None:
-        bank = Bank([Battery(int(x)) for x in "911111111111118"])
-        self.assertEqual(bank.bank_heap.root.voltage, 9)
-        self.assertEqual(bank.bank_heap.left.root.voltage, 1)
-        self.assertEqual(bank.bank_heap.left.right.root.voltage, 8)
+    def test_all_descending_voltage(self) -> None:
+        bank = Bank([Battery(int(x)) for x in "432"])
+        self.assertEqual(bank.bank_heap.root.voltage, 4)
+        self.assertEqual(bank.bank_heap.left.root.voltage, 3)
+        self.assertEqual(bank.bank_heap.left.left.root.voltage, 2)
         self.assertIsNone(bank.bank_heap.right)
 
-    def test_bank_tree_full_branches(self) -> None:
-        bank = Bank([Battery(int(x)) for x in "5136438"])
-        self.assertEqual(bank.bank_heap.root.voltage, 5)
-        self.assertEqual(bank.bank_heap.left.root.voltage, 1)
-        self.assertEqual(bank.bank_heap.right.root.voltage, 6)
+    def test_same_voltage(self) -> None:
+        bank = Bank([Battery(int(x)) for x in "44"])
+        self.assertEqual(bank.bank_heap.root.voltage, 4)
+        self.assertEqual(bank.bank_heap.left.root.voltage, 4)
+        self.assertIsNone(bank.bank_heap.right)
 
-    def test_bank_tree_right_branch_has_battery_with_same_voltage(self) -> None:
-        bank = Bank([Battery(int(x)) for x in "55356438"])
-        self.assertEqual(bank.bank_heap.root.voltage, 5)
-        self.assertEqual(bank.bank_heap.left.root.voltage, 5)
-        self.assertEqual(bank.bank_heap.right.root.voltage, 6)
+    def test_largest_voltage_in_middle(self) -> None:
+        bank = Bank([Battery(int(x)) for x in "4981"])
+        self.assertEqual(bank.bank_heap.root.voltage, 4)
+        self.assertEqual(bank.bank_heap.left.root.voltage, 1)
+        self.assertEqual(bank.bank_heap.right.root.voltage, 9)
+        self.assertEqual(bank.bank_heap.right.left.root.voltage, 8)
