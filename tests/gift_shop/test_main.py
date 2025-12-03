@@ -42,33 +42,3 @@ class TestProductIDRange(TestCase):
     def test_product_ids_in_range(self) -> None:
         product_range = [int(id_) for id_ in ProductIDRange(start=ProductID(11), end=ProductID(22)).product_ids_in_range]
         self.assertEqual(product_range, [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22])
-
-    def test_repeating_product_ids_at_range_terminals(self) -> None:
-        product_range = [
-            int(id_) for id_ in ProductIDRange(start=ProductID(11), end=ProductID(22)).repeat_once_product_ids_from_range
-        ]
-        self.assertEqual(product_range, [11, 22])
-
-    def test_one_repeating_product_ids_in_range(self) -> None:
-        start = ProductID(1188511880)
-        end = ProductID(1188511890)
-        product_range = [int(id_) for id_ in ProductIDRange(start=start, end=end).repeat_once_product_ids_from_range]
-        self.assertEqual(product_range, [1188511885])
-
-    def test_no_repeating_product_ids_in_range(self) -> None:
-        start = ProductID(1698522)
-        end = ProductID(1698528)
-        product_range = [int(id_) for id_ in ProductIDRange(start=start, end=end).repeat_once_product_ids_from_range]
-        self.assertEqual(product_range, [])
-
-    def test_one_repeating_product_ids_in_singleton_range(self) -> None:
-        start = ProductID(11)
-        end = ProductID(11)
-        product_range = [int(id_) for id_ in ProductIDRange(start=start, end=end).repeat_once_product_ids_from_range]
-        self.assertEqual(product_range, [11])
-
-    def test_no_repeating_product_ids_in_singleton_range(self) -> None:
-        start = ProductID(12)
-        end = ProductID(12)
-        product_range = [int(id_) for id_ in ProductIDRange(start=start, end=end).repeat_once_product_ids_from_range]
-        self.assertEqual(product_range, [])

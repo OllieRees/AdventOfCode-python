@@ -36,11 +36,3 @@ class ProductIDRange:
     def product_ids_in_range(self) -> Iterator[ProductID]:
         for x in range(self.start.id_, self.end.id_ + 1):
             yield ProductID(x)
-
-    @property
-    def repeat_once_product_ids_from_range(self) -> Iterator[ProductID]:
-        return filter(lambda x: x.repeats_once, self.product_ids_in_range)
-
-    @property
-    def repeating_product_ids_from_range(self) -> Iterator[ProductID]:
-        return filter(lambda x: x.is_repeating, self.product_ids_in_range)

@@ -13,7 +13,7 @@ def main(lines: Iterator[str]) -> None:
     half_count, repeat_count = 0, 0
     for line in lines:
         for range in generate_product_id_ranges(line):
-            half_count += sum(int(product_id) for product_id in range.repeat_once_product_ids_from_range)
-            repeat_count += sum(int(product_id) for product_id in range.repeating_product_ids_from_range)
+            half_count += sum(int(product_id) for product_id in filter(lambda x: x.repeats_once, range.product_ids_in_range))
+            repeat_count += sum(int(product_id) for product_id in filter(lambda x: x.is_repeating, range.product_ids_in_range))
     print(f"Total sum of invalid IDs: {half_count}")
     print(f"Total sum of invalid IDs: {repeat_count}")
