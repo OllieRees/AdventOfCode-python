@@ -1,4 +1,4 @@
-from typing import List
+from typing import Iterator, List, Tuple
 
 
 class Battery:
@@ -45,3 +45,6 @@ class Battery:
 class Bank:
     def __init__(self, batteries: List[Battery]) -> None:
         self.batteries = batteries
+
+    def sorted_battery_positions(self) -> Iterator[Tuple[int, Battery]]:
+        return iter(sorted(enumerate(self.batteries), key=lambda x: x[1], reverse=True))
