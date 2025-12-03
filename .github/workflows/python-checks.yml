@@ -31,6 +31,9 @@ jobs:
     - name: Create Poetry Environment
       run: |
         poetry install
+    - name: Type Check with mypy
+      run: |
+        poetry run mypy src
     - name: Lint with ruff
       run: |
         poetry run ruff check
