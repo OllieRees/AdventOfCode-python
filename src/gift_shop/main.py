@@ -1,4 +1,5 @@
 from functools import cached_property
+from typing import Iterator
 
 
 class ProductID:
@@ -7,16 +8,19 @@ class ProductID:
 
     @cached_property
     def id_(self) -> int:
+        return int(self)
+
+    def __int__(self) -> int:
         return int(self._id)
 
     @cached_property
-    def digit_count(self) -> int:
+    def _digit_count(self) -> int:
         return len(self._id)
 
     @cached_property
     def is_repeating(self) -> bool:
-        half: int = self.digit_count // 2
-        return len(set(self._id)) == 1 or (self.digit_count % 2 == 0 and self._id[:half] == self._id[half:])
+        half: int = self._digit_count // 2
+        return self._digit_count % 2 == 0 and self._id[:half] == self._id[half:]
 
 
 class ProductIDRange:
@@ -25,5 +29,10 @@ class ProductIDRange:
         self.end = end
 
     @property
-    def repeating_numbers_from_range(self) -> int:
-        return 0
+    def product_ids_in_range(self) -> Iterator[ProductID]:
+        for x in range(self.start.id_, self.end.id_ + 1):
+            yield ProductID(x)
+
+    @property
+    def repeating_numbers_from_range(self) -> Iterator[ProductID]:
+        return filter(lambda x: x.is_repeating, self.product_ids_in_range)
