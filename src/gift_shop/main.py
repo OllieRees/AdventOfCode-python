@@ -1,3 +1,4 @@
+import re
 from functools import cached_property
 from typing import Iterator
 
@@ -18,9 +19,12 @@ class ProductID:
         return len(self._id)
 
     @cached_property
+    def repeats_once(self) -> bool:
+        return re.search(r"^(\d+)(\1)$", self._id) is not None
+
+    @cached_property
     def is_repeating(self) -> bool:
-        half: int = self._digit_count // 2
-        return self._digit_count % 2 == 0 and self._id[:half] == self._id[half:]
+        return re.search(r"^(\d+)\1+$", self._id) is not None
 
 
 class ProductIDRange:
@@ -34,5 +38,9 @@ class ProductIDRange:
             yield ProductID(x)
 
     @property
-    def repeating_numbers_from_range(self) -> Iterator[ProductID]:
+    def repeat_once_product_ids_from_range(self) -> Iterator[ProductID]:
+        return filter(lambda x: x.repeats_once, self.product_ids_in_range)
+
+    @property
+    def repeating_product_ids_from_range(self) -> Iterator[ProductID]:
         return filter(lambda x: x.is_repeating, self.product_ids_in_range)
