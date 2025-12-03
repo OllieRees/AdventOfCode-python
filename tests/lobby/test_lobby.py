@@ -65,3 +65,7 @@ class TestBank(TestCase):
         positions: List[Tuple[int, Battery]] = list(bank.sorted_battery_positions())
         self.assertEqual(positions[0], (13, Battery(8)))
         self.assertEqual(positions[1], (14, Battery(7)))
+
+    def test_bank_size(self) -> None:
+        bank = Bank([Battery(int(x)) for x in "234234234234287"])
+        self.assertEqual(bank.size, 15)
