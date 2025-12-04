@@ -1,24 +1,14 @@
 from typing import Iterator
 
-from lobby.main import Bank, Battery
 
-
-def largest_2_digits(bank: Bank) -> int:
-    if len(bank.batteries) == 1:
-        return bank.batteries[0].voltage
-    if len(bank.batteries) == 2:
-        return bank.batteries[0].voltage * 10 + bank.batteries[1].voltage
-    first_battery = bank.batteries[0]
-    second_battery = bank.batteries[1]
-    for battery in bank.batteries[2:]:
-        if second_battery > first_battery:
-            first_battery = second_battery
-            second_battery = battery
-        elif battery > second_battery:
-            second_battery = battery
-    return first_battery.voltage * 10 + second_battery.voltage
+def largest_n_digits(bank: list[int], n: int) -> int:
+    if n == 1:
+        return max(bank)
+    pos, battery = max(enumerate(bank[: -(n - 1)]), key=lambda x: x[1])
+    return int(battery * 10 ** (n - 1)) + largest_n_digits(bank[(pos + 1) :], n - 1)
 
 
 def main(lines: Iterator[str]) -> None:
-    banks = [Bank(batteries=[Battery(int(c)) for c in line]) for line in lines]
-    print(sum(largest_2_digits(bank) for bank in banks))
+    banks: list[list[int]] = [[int(c) for c in line] for line in lines]
+    print(sum(largest_n_digits(bank, 2) for bank in banks))
+    print(sum(largest_n_digits(bank, 12) for bank in banks))
