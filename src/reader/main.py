@@ -6,6 +6,7 @@ import gift_shop as GiftShop
 import historianhysteria.main as HistorianHysteria
 import lobby as Lobby
 import mulledwine.main as MulledWine
+import printing_department as PrintingDepartment
 import rudolphreports.main as RudolphReports
 import secret_entrance as SecretEntrance
 
@@ -16,6 +17,7 @@ PUZZLES: Dict[Tuple[int, int], Callable[[Iterator[str]], None]] = {
     (2025, 1): SecretEntrance.main,
     (2025, 2): GiftShop.main,
     (2025, 3): Lobby.main,
+    (2025, 4): PrintingDepartment.main,
 }
 
 
