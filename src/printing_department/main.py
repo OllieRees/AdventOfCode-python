@@ -7,14 +7,10 @@ class ToiletRoll:
 
 
 class GridPosition:
-    def __init__(self, *, roll: Optional[ToiletRoll] = None, x: int, y: int) -> None:
-        self._roll = roll
+    def __init__(self, *, has_roll: bool, x: int, y: int) -> None:
+        self._has_roll = has_roll
         self._x = x
         self._y = y
-
-    @property
-    def roll(self) -> Optional[ToiletRoll]:
-        return self._roll
 
     @property
     def x(self) -> int:
@@ -30,10 +26,10 @@ class GridPosition:
 
     @property
     def is_empty(self) -> bool:
-        return self._roll is None
+        return not self._has_roll
 
     def __str__(self) -> str:
-        return "." if self.is_empty else str(self._roll)
+        return "." if self.is_empty else "@"
 
     def __eq__(self, value: object) -> bool:
         if not isinstance(value, GridPosition):
@@ -87,13 +83,25 @@ class Grid:
     def accessible_by_forklift_count(self) -> int:
         return sum(1 for j in range(self._ncol) for i in range(self._nrow) if self.accessible_by_forklift(x=i, y=j))
 
+    def move_rolls(self) -> "Grid":
+        return Grid(
+            positions=[
+                [
+                    GridPosition(
+                        has_roll=(not self._elements[i][j].is_empty and not self.accessible_by_forklift(x=i, y=j)), x=i, y=j
+                    )
+                    for j in range(self._ncol)
+                ]
+                for i in range(self._nrow)
+            ]
+        )
+
     def __str__(self) -> str:
         return "\n".join(["".join([str(e) for e in row]) for row in self._elements])
 
 
 def str2grid(grid_str: Iterator[str], roll_str: str) -> Grid:
     positions = [
-        [GridPosition(roll=ToiletRoll() if token == roll_str else None, x=x, y=y) for y, token in enumerate(row)]
-        for x, row in enumerate(grid_str)
+        [GridPosition(has_roll=token == roll_str, x=x, y=y) for y, token in enumerate(row)] for x, row in enumerate(grid_str)
     ]
     return Grid(positions=positions)
