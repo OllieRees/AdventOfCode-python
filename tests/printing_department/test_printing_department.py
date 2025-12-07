@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from printing_department.main import GridPosition, ToiletRoll, str2grid
+from printing_department.main import GridPosition, str2grid
 
 
 class TestGrid(TestCase):
@@ -34,7 +34,7 @@ class TestGrid(TestCase):
 
     def test_middle_has_middle(self) -> None:
         grid = str2grid(grid_str=["@@@", "@@@", "@@@"], roll_str="@")
-        self.assertEqual(grid.middle, GridPosition(roll=ToiletRoll(), x=1, y=1))
+        self.assertEqual(grid.middle, GridPosition(has_roll=True, x=1, y=1))
 
     def test_middle_even_row_count(self) -> None:
         grid = str2grid(grid_str=["@@@", "@@@"], roll_str="@")

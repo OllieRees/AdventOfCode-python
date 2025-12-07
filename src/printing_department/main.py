@@ -1,11 +1,6 @@
 from typing import Iterator, Optional, Tuple
 
 
-class ToiletRoll:
-    def __str__(self) -> str:
-        return "@"
-
-
 class GridPosition:
     def __init__(self, *, has_roll: bool, x: int, y: int) -> None:
         self._has_roll = has_roll
