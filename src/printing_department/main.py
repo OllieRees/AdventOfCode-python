@@ -1,8 +1,5 @@
 from typing import Iterator, Optional, Tuple
 
-import numpy as np
-from numpy.lib.stride_tricks import sliding_window_view
-
 
 class ToiletRoll:
     def __str__(self) -> str:
@@ -10,7 +7,7 @@ class ToiletRoll:
 
 
 class GridPosition:
-    def __init__(self, *, roll: Optional[ToiletRoll], x: int, y: int) -> None:
+    def __init__(self, *, roll: Optional[ToiletRoll] = None, x: int, y: int) -> None:
         self._roll = roll
         self._x = x
         self._y = y
@@ -57,10 +54,6 @@ class Grid:
         return len(self._elements[0])
 
     @property
-    def _np_arr(self) -> np._typing.NDArray:
-        return np.array(self._elements)
-
-    @property
     def middle(self) -> Optional[GridPosition]:
         if self._nrow % 2 == 0 or self._ncol % 2 == 0:
             return None
@@ -70,8 +63,29 @@ class Grid:
     def roll_count(self) -> int:
         return sum(1 for row in self._elements for e in row if not e.is_empty)
 
-    def window_iterator(self, *, win_row_cnt: int, win_col_cnt: int) -> Iterator["Grid"]:
-        return iter(Grid(positions=poss) for row in sliding_window_view(self._np_arr, (win_row_cnt, win_col_cnt)) for poss in row)
+    def _safe_get_element(self, *, x: int, y: int) -> Optional[GridPosition]:
+        if x < 0 or x >= self._nrow:
+            return None
+        if y < 0 or y >= self._ncol:
+            return None
+        return self._elements[x][y]
+
+    def accessible_by_forklift(self, *, x: int, y: int) -> bool:
+        adj_pos = [
+            self._safe_get_element(x=x - 1, y=y),
+            self._safe_get_element(x=x + 1, y=y),
+            self._safe_get_element(x=x, y=y - 1),
+            self._safe_get_element(x=x, y=y + 1),
+            self._safe_get_element(x=x - 1, y=y - 1),
+            self._safe_get_element(x=x - 1, y=y + 1),
+            self._safe_get_element(x=x + 1, y=y - 1),
+            self._safe_get_element(x=x + 1, y=y + 1),
+        ]
+        return sum(1 for pos in adj_pos if pos and not pos.is_empty) < 4 and not self._elements[x][y].is_empty
+
+    @property
+    def accessible_by_forklift_count(self) -> int:
+        return sum(1 for j in range(self._ncol) for i in range(self._nrow) if self.accessible_by_forklift(x=i, y=j))
 
     def __str__(self) -> str:
         return "\n".join(["".join([str(e) for e in row]) for row in self._elements])

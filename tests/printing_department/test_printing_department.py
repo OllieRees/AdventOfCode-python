@@ -32,11 +32,6 @@ class TestGrid(TestCase):
         grid = str2grid(grid_str=["...", "...", "..."], roll_str="@")
         self.assertEqual(grid.roll_count, 0)
 
-    def test_window_iterator(self) -> None:
-        windows = list(self.grid.window_iterator(win_row_cnt=3, win_col_cnt=3))
-        self.assertEqual(str(windows[0]), "..@\n@@@\n@@@")
-        self.assertEqual(str(windows[-1]), "@@@\n@@.\n.@.")
-
     def test_middle_has_middle(self) -> None:
         grid = str2grid(grid_str=["@@@", "@@@", "@@@"], roll_str="@")
         self.assertEqual(grid.middle, GridPosition(roll=ToiletRoll(), x=1, y=1))
@@ -48,3 +43,12 @@ class TestGrid(TestCase):
     def test_middle_even_column_count(self) -> None:
         grid = str2grid(grid_str=["@@", "@@", "@@"], roll_str="@")
         self.assertIsNone(grid.middle)
+
+    def test_is_accessible_by_forklift(self) -> None:
+        self.assertTrue(self.grid.accessible_by_forklift(x=1, y=0))
+
+    def test_is_inaccessible_by_forklift_due_to_being_empty(self) -> None:
+        self.assertFalse(self.grid.accessible_by_forklift(x=3, y=1))
+
+    def test_is_inaccessible_by_forklift_on_side(self) -> None:
+        self.assertFalse(self.grid.accessible_by_forklift(x=2, y=0))
