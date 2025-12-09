@@ -47,6 +47,12 @@ class TestFreshRange(TestCase):
         self.assertFalse(range.is_in_range(9))
         self.assertFalse(range.is_in_range(17))
 
+    def test_range_size(self) -> None:
+        self.assertEqual(FreshRange(start=10, end=11).range_size, 2)
+
+    def test_range_size_singleton(self) -> None:
+        self.assertEqual(FreshRange(start=10, end=10).range_size, 1)
+
     def test_superset_range_from_overlapping_ranges(self) -> None:
         pass
 
