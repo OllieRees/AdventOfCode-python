@@ -86,8 +86,8 @@ class TestReport(TestCase):
             report._fresh_ranges_sorted,
             [
                 FreshRange(start=3, end=5),
-                FreshRange(start=10, end=14),
                 FreshRange(start=8, end=16),
+                FreshRange(start=10, end=14),
                 FreshRange(start=12, end=18),
                 FreshRange(start=16, end=20),
             ],

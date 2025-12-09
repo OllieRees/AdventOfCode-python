@@ -56,7 +56,7 @@ class Report:
 
     @property
     def _fresh_ranges_sorted(self) -> list[FreshRange]:
-        return list(sorted(self._fresh_ranges, key=lambda r: r.end))
+        return list(sorted(self._fresh_ranges, key=lambda r: r.start))
 
     def is_fresh(self, ingredient_id: int) -> bool:
         return any(fresh_range.is_in_range(ingredient_id) for fresh_range in self._fresh_ranges)
