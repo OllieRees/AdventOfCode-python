@@ -17,6 +17,12 @@ class FreshRange:
     def end(self) -> int:
         return self._end
 
+    @property
+    def range_size(self) -> int:
+        if self.start == self.end:
+            return 1
+        return self.end - self.start + 1
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, FreshRange):
             raise TypeError()

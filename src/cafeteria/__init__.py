@@ -1,8 +1,8 @@
-from typing import Iterator, Tuple
+from typing import Iterator
 
-from cafeteria.main import Document, FreshRange, Report
+from cafeteria.main import Document
 
 
 def main(lines: Iterator[str]) -> None:
     report = Document(lines=lines).report
-    print(report.fresh_ingredients)
+    print(f"Number of fresh ingredients: {len(report.fresh_ingredients)}")
