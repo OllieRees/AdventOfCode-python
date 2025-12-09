@@ -8,6 +8,7 @@ if __name__ == "__main__":
     puzzle.run(InputMode.PRACTICE)
     print("-------------------------------------------")
     puzzle.run(InputMode.REAL)
+    print("-------------------------------------------")
     try:
         puzzle.run(InputMode.BIGBOY)
     except FileNotFoundError:
