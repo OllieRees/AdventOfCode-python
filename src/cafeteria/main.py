@@ -17,9 +17,16 @@ class FreshRange:
     def end(self) -> int:
         return self._end
 
-    @property
-    def id_set(self) -> Set[int]:
-        return set(range(self.start, self.end + 1))
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, FreshRange):
+            raise TypeError()
+        return self.start == other.start and self.end == other.end
+
+    def __str__(self) -> str:
+        return f"{self.start}-{self.end}"
+
+    def __hash__(self):
+        return hash((self.start, self.end))
 
     def is_in_range(self, ingredient: int) -> bool:
         return self.start <= ingredient <= self.end
@@ -35,14 +42,9 @@ class FreshRange:
             return FreshRange(start=other.start, end=self.end)
         return None
 
-    def __eq__(self, other: object) -> bool:
-        if not isinstance(other, FreshRange):
-            raise TypeError()
-        return self.start == other.start and self.end == other.end
-
 
 class Report:
-    def __init__(self, *, fresh_ranges: Iterator[FreshRange], ingredient_ids: set[int]) -> None:
+    def __init__(self, *, fresh_ranges: set[FreshRange], ingredient_ids: set[int]) -> None:
         self._fresh_ranges = fresh_ranges
         self._ingredient_ids = ingredient_ids
 
@@ -51,7 +53,7 @@ class Report:
 
     @property
     def fresh_ingredients(self) -> Set[int]:
-        return {ingredient for ingredient in self._ingredient_ids if self.is_fresh(ingredient)}
+        return set(filter(lambda ingredient: self.is_fresh(ingredient), self._ingredient_ids))
 
 
 class Document:
@@ -80,4 +82,4 @@ class Document:
 
     @property
     def report(self) -> Report:
-        return Report(fresh_ranges=self.fresh_ingredient_ranges, ingredient_ids=self.ingredient_ids)
+        return Report(fresh_ranges=set(self.fresh_ingredient_ranges), ingredient_ids=self.ingredient_ids)

@@ -1,6 +1,8 @@
 from unittest import TestCase
 
-from cafeteria.main import Document, FreshRange
+import pytest
+
+from cafeteria.main import Document, FreshRange, Report
 
 
 class TestDocument(TestCase):
@@ -25,19 +27,25 @@ class TestDocument(TestCase):
 
 class TestFreshRange(TestCase):
     def test_range(self) -> None:
-        pass
+        range = FreshRange(start=10, end=16)
+        self.assertEqual(range.start, 10)
+        self.assertEqual(range.end, 16)
 
     def test_range_start_larger_than_end(self) -> None:
-        pass
-
-    def test_range_set(self) -> None:
-        pass
+        with pytest.raises(ValueError):
+            FreshRange(start=10, end=9)
 
     def test_is_in_range(self) -> None:
-        pass
+        range = FreshRange(start=10, end=16)
+        self.assertTrue(range.is_in_range(10))
+        self.assertTrue(range.is_in_range(11))
+        self.assertTrue(range.is_in_range(15))
+        self.assertTrue(range.is_in_range(16))
 
     def test_is_not_in_range(self) -> None:
-        pass
+        range = FreshRange(start=10, end=16)
+        self.assertFalse(range.is_in_range(9))
+        self.assertFalse(range.is_in_range(17))
 
     def test_superset_range_from_overlapping_ranges(self) -> None:
         pass
@@ -53,5 +61,14 @@ class TestFreshRange(TestCase):
 
 
 class TestReport(TestCase):
+    def setUp(self) -> None:
+        self.report = Report(fresh_ranges=[FreshRange(start=10, end=16)], ingredient_ids={1, 10, 13, 16, 18})
+
+    def test_ingredient_is_fresh(self) -> None:
+        self.assertTrue(self.report.is_fresh(10))
+
+    def test_ingredient_is_not_fresh(self) -> None:
+        self.assertFalse(self.report.is_fresh(17))
+
     def test_fresh_ingredients(self) -> None:
-        pass
+        self.assertEqual(self.report.fresh_ingredients, {10, 13, 16})
