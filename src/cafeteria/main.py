@@ -44,7 +44,7 @@ class FreshRange:
 
 
 class Report:
-    def __init__(self, *, fresh_ranges: set[FreshRange], ingredient_ids: set[int]) -> None:
+    def __init__(self, *, fresh_ranges: set[FreshRange], ingredient_ids: list[int]) -> None:
         self._fresh_ranges = fresh_ranges
         self._ingredient_ids = ingredient_ids
 
@@ -77,8 +77,8 @@ class Document:
             yield FreshRange(start=int(x[0]), end=int(x[1]))
 
     @property
-    def ingredient_ids(self) -> set[int]:
-        return {int(id_) for id_ in self._id_lines}
+    def ingredient_ids(self) -> list[int]:
+        return [int(id_) for id_ in self._id_lines]
 
     @property
     def report(self) -> Report:

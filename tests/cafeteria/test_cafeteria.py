@@ -18,11 +18,11 @@ class TestDocument(TestCase):
         self.assertIn(FreshRange(start=12, end=18), ranges)
 
     def test_get_ingredient_ids(self) -> None:
-        self.assertEqual(self.document.ingredient_ids, {1, 5, 8, 11, 17, 32})
+        self.assertEqual(self.document.ingredient_ids, [1, 5, 8, 11, 17, 32])
 
     def test_get_report(self) -> None:
-        self.assertEqual(self.document.report._ingredient_ids, self.document.ingredient_ids)
-        self.assertListEqual(list(self.document.report._fresh_ranges), list(self.document.fresh_ingredient_ranges))
+        self.assertListEqual(self.document.report._ingredient_ids, self.document.ingredient_ids)
+        self.assertEqual(self.document.report._fresh_ranges, set(self.document.fresh_ingredient_ranges))
 
 
 class TestFreshRange(TestCase):
