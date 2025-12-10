@@ -53,18 +53,6 @@ class TestFreshRange(TestCase):
     def test_range_size_singleton(self) -> None:
         self.assertEqual(FreshRange(start=10, end=10).range_size, 1)
 
-    def test_superset_range_from_overlapping_ranges(self) -> None:
-        pass
-
-    def test_superset_range_from_subset_ranges(self) -> None:
-        pass
-
-    def test_superset_range_from_equal_ranges(self) -> None:
-        pass
-
-    def test_superset_range_when_no_superset_exists(self) -> None:
-        pass
-
 
 class TestReport(TestCase):
     def setUp(self) -> None:
@@ -78,17 +66,3 @@ class TestReport(TestCase):
 
     def test_fresh_ingredients(self) -> None:
         self.assertEqual(self.report.fresh_ingredients, {10, 13, 16})
-
-    def test_fresh_ranges_sorted(self) -> None:
-        lines = ["10-14", "3-5", "16-20", "12-18", "8-16", "", "1", "5", "8", "11", "17", "32"]
-        report = Document(lines=lines).report
-        self.assertListEqual(
-            report._fresh_ranges_sorted,
-            [
-                FreshRange(start=3, end=5),
-                FreshRange(start=8, end=16),
-                FreshRange(start=10, end=14),
-                FreshRange(start=12, end=18),
-                FreshRange(start=16, end=20),
-            ],
-        )

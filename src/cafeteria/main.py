@@ -1,5 +1,5 @@
 import re
-from typing import Iterator, Optional, Set
+from typing import Iterator, Set
 
 
 class FreshRange:
@@ -37,17 +37,6 @@ class FreshRange:
     def is_in_range(self, ingredient: int) -> bool:
         return self.start <= ingredient <= self.end
 
-    def superset(self, other: "FreshRange") -> Optional["FreshRange"]:
-        if self.start == other.start:
-            return FreshRange(start=self.start, end=max([self.end, other.end]))
-        if self.end == other.end:
-            return FreshRange(start=min([self.start, other.start]), end=self.end)
-        if self.end < other.end and self.end >= other.start:  # x0 -> y0 -> x1 -> y1
-            return FreshRange(start=self.start, end=other.end)
-        if other.end < self.end and other.end >= self.start:  # y0 -> x0 -> y1 -> x1
-            return FreshRange(start=other.start, end=self.end)
-        return None
-
 
 class Report:
     def __init__(self, *, fresh_ranges: set[FreshRange], ingredient_ids: list[int]) -> None:
@@ -55,8 +44,16 @@ class Report:
         self._ingredient_ids = ingredient_ids
 
     @property
-    def _fresh_ranges_sorted(self) -> list[FreshRange]:
-        return list(sorted(self._fresh_ranges, key=lambda r: r.start))
+    def fresh_ranges(self) -> set[FreshRange]:
+        sorted_ranges = list(sorted(self._fresh_ranges, key=lambda r: r.start))
+        unique_ranges: list[FreshRange] = [sorted_ranges[0]]
+        for x, y in zip(sorted_ranges, sorted_ranges[1:]):
+            if x.start == y.start or x.end >= y.end or x.end >= y.start:
+                start = unique_ranges.pop().start
+                unique_ranges.append(FreshRange(start=start, end=max([x.end, y.end])))
+            else:
+                unique_ranges.append(y)
+        return set(unique_ranges)
 
     def is_fresh(self, ingredient_id: int) -> bool:
         return any(fresh_range.is_in_range(ingredient_id) for fresh_range in self._fresh_ranges)
