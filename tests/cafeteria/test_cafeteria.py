@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import pytest
 
-from cafeteria.main import Document, FreshRange, Report
+from cafeteria.main import Document, FreshRange
 
 
 class TestDocument(TestCase):
@@ -56,13 +56,17 @@ class TestFreshRange(TestCase):
 
 class TestReport(TestCase):
     def setUp(self) -> None:
-        self.report = Report(fresh_ranges=[FreshRange(start=10, end=16)], ingredient_ids={1, 10, 13, 16, 18})
+        lines = ["3-5", "10-14", "16-20", "12-18", "", "1", "5", "8", "11", "17", "32"]
+        self.report = Document(lines=lines).report
 
     def test_ingredient_is_fresh(self) -> None:
         self.assertTrue(self.report.is_fresh(10))
 
     def test_ingredient_is_not_fresh(self) -> None:
-        self.assertFalse(self.report.is_fresh(17))
+        self.assertFalse(self.report.is_fresh(21))
 
     def test_fresh_ingredients(self) -> None:
-        self.assertEqual(self.report.fresh_ingredients, {10, 13, 16})
+        self.assertEqual(self.report.fresh_ingredients, {5, 11, 17})
+
+    def test_fresh_ranges(self) -> None:
+        self.assertEqual(self.report.fresh_ranges, {FreshRange(start=3, end=5), FreshRange(start=10, end=20)})
